@@ -1,0 +1,54 @@
+.where-to-buy {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 32px;
+  margin-top: 32px;
+  align-items: start;
+}
+
+.where-to-buy__panel {
+  padding: 32px;
+}
+
+.where-to-buy__intro {
+  color: var(--color-text-muted);
+  margin: 8px 0 24px;
+}
+
+.pharmacy-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.pharmacy-list__item {
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.pharmacy-list__item h4 {
+  margin: 0 0 6px;
+  font-family: var(--font-serif);
+}
+
+.pharmacy-list__item p {
+  margin: 0 0 2px;
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+}
+
+.pharmacy-list__map {
+  display: inline-block;
+  margin-top: 6px;
+  color: var(--color-gold);
+  font-size: 0.85rem;
+}
+
+@media (max-width: 900px) {
+  .where-to-buy {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,36 @@
+.contact-page {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 40px;
+  margin-top: 32px;
+}
+
+.contact-page__form {
+  padding: 32px;
+}
+
+.contact-page__details {
+  padding: 8px 0;
+}
+
+.contact-page__details p {
+  margin: 0 0 12px;
+  color: var(--color-text-muted);
+}
+
+.contact-page__social {
+  display: flex;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.contact-page__social a {
+  color: var(--color-gold);
+  text-transform: capitalize;
+}
+
+@media (max-width: 800px) {
+  .contact-page {
+    grid-template-columns: 1fr;
+  }
+}

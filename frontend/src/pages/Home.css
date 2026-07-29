@@ -1,0 +1,83 @@
+.hero {
+  background: var(--color-black);
+  background-size: cover;
+  background-position: center;
+  color: var(--color-offwhite);
+  padding: 120px 0;
+}
+
+.hero__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+}
+
+.hero__logo {
+  height: 110px;
+  width: 110px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 12px;
+  border: 2px solid var(--color-gold);
+}
+
+.hero__title {
+  color: var(--color-offwhite);
+  font-size: 3rem;
+  margin: 0;
+}
+
+.hero__tagline {
+  max-width: 500px;
+  color: var(--color-offwhite);
+  opacity: 0.9;
+}
+
+.hero__actions {
+  display: flex;
+  gap: 16px;
+  margin-top: 24px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 28px;
+  margin-top: 32px;
+}
+
+.about-teaser {
+  text-align: center;
+  display: flex;
+  justify-content: center;
+}
+
+.about-teaser > div {
+  max-width: 640px;
+}
+
+.about-teaser p {
+  margin: 16px 0 24px;
+  opacity: 0.85;
+}
+
+.how-to-buy {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+  margin-top: 32px;
+}
+
+.how-to-buy__option {
+  padding: 32px;
+  text-align: left;
+}
+
+.how-to-buy__option p {
+  color: var(--color-text-muted);
+  margin: 12px 0 20px;
+}

@@ -1,0 +1,33 @@
+.about-page__body {
+  display: flex;
+  gap: 48px;
+  margin-top: 24px;
+  align-items: flex-start;
+}
+
+.about-page__image {
+  flex: 0 0 360px;
+  border-radius: var(--radius);
+  border: 2px solid var(--color-gold);
+}
+
+.about-page__text {
+  flex: 1;
+  font-size: 1.05rem;
+  color: var(--color-text-dark);
+}
+
+.about-page__text p {
+  margin: 0 0 16px;
+}
+
+@media (max-width: 800px) {
+  .about-page__body {
+    flex-direction: column;
+  }
+
+  .about-page__image {
+    flex-basis: auto;
+    width: 100%;
+  }
+}

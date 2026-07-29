@@ -1,0 +1,25 @@
+.admin-login {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-black);
+}
+
+.admin-login__card {
+  background: var(--color-white);
+  padding: 48px;
+  border-radius: var(--radius);
+  width: 380px;
+  max-width: 90vw;
+  border-top: 3px solid var(--color-gold);
+}
+
+.admin-login__card h1 {
+  margin-bottom: 24px;
+}
+
+.admin-login__submit {
+  width: 100%;
+  margin-top: 8px;
+}
