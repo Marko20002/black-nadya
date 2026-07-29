@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-export const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
+export const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
 const ACCESS_KEY = 'bn_access_token';
 const REFRESH_KEY = 'bn_refresh_token';
