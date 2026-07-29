@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { getCategories, getProducts } from '../api/resources';
+import { categoryLabel } from '../i18n/categoryLabel';
 import ProductCard from '../components/ProductCard';
 import Loader from '../components/Loader';
 import './Products.css';
 
 export default function Products() {
+  const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const activeCategory = searchParams.get('category') || '';
   const [categories, setCategories] = useState([]);
@@ -35,8 +38,8 @@ export default function Products() {
   return (
     <div className="section">
       <div className="container">
-        <span className="eyebrow">Shop</span>
-        <h1>Our Products</h1>
+        <span className="eyebrow">{t('products.eyebrow')}</span>
+        <h1>{t('products.title')}</h1>
         <hr className="rule-gold" />
 
         <div className="category-filter">
@@ -45,7 +48,7 @@ export default function Products() {
             className={`category-filter__pill${!activeCategory ? ' category-filter__pill--active' : ''}`}
             onClick={() => selectCategory('')}
           >
-            All
+            {t('products.all')}
           </button>
           {categories.map((cat) => (
             <button
@@ -54,13 +57,13 @@ export default function Products() {
               className={`category-filter__pill${activeCategory === cat.slug ? ' category-filter__pill--active' : ''}`}
               onClick={() => selectCategory(cat.slug)}
             >
-              {cat.name}
+              {categoryLabel(cat, t)}
             </button>
           ))}
         </div>
 
         {loading ? (
-          <Loader label="Loading products…" />
+          <Loader label={t('products.loading')} />
         ) : products.length > 0 ? (
           <div className="product-grid">
             {products.map((product) => (
@@ -68,7 +71,7 @@ export default function Products() {
             ))}
           </div>
         ) : (
-          <p>No products found in this category yet.</p>
+          <p>{t('products.empty')}</p>
         )}
       </div>
     </div>

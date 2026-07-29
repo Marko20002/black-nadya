@@ -2,15 +2,28 @@ import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { adminPharmacies } from '../api/resources';
 import ConfirmDialog from '../components/ConfirmDialog';
+import LangTabs from './components/LangTabs';
 
-const EMPTY_FORM = { name: '', address: '', city: '', phone: '', map_link: '', is_active: true };
+const TRANSLATED_BASES = ['name', 'address'];
+const LANGS = ['en', 'mk', 'sq'];
+
+function emptyForm() {
+  const form = { city: '', phone: '', map_link: '', is_active: true };
+  TRANSLATED_BASES.forEach((base) => {
+    LANGS.forEach((lang) => {
+      form[`${base}_${lang}`] = '';
+    });
+  });
+  return form;
+}
 
 export default function ManagePharmacies() {
   const [pharmacies, setPharmacies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState(null);
-  const [form, setForm] = useState(EMPTY_FORM);
+  const [form, setForm] = useState(emptyForm());
+  const [activeLang, setActiveLang] = useState('en');
   const [saving, setSaving] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
 
@@ -27,13 +40,26 @@ export default function ManagePharmacies() {
 
   const openAdd = () => {
     setEditing(null);
-    setForm(EMPTY_FORM);
+    setForm(emptyForm());
+    setActiveLang('en');
     setModalOpen(true);
   };
 
   const openEdit = (pharmacy) => {
     setEditing(pharmacy);
-    setForm({ ...pharmacy });
+    const next = {
+      city: pharmacy.city,
+      phone: pharmacy.phone,
+      map_link: pharmacy.map_link,
+      is_active: pharmacy.is_active,
+    };
+    TRANSLATED_BASES.forEach((base) => {
+      LANGS.forEach((lang) => {
+        next[`${base}_${lang}`] = pharmacy[`${base}_${lang}`] || '';
+      });
+    });
+    setForm(next);
+    setActiveLang('en');
     setModalOpen(true);
   };
 
@@ -103,7 +129,7 @@ export default function ManagePharmacies() {
             <tbody>
               {pharmacies.map((pharmacy) => (
                 <tr key={pharmacy.id}>
-                  <td>{pharmacy.name}</td>
+                  <td>{pharmacy.name_en}</td>
                   <td>{pharmacy.city}</td>
                   <td>{pharmacy.phone}</td>
                   <td>
@@ -137,14 +163,31 @@ export default function ManagePharmacies() {
           <div className="admin-modal" onClick={(e) => e.stopPropagation()}>
             <h2>{editing ? 'Edit Pharmacy' : 'Add Pharmacy'}</h2>
             <form onSubmit={handleSubmit}>
+              <label>Translated Content</label>
+              <LangTabs active={activeLang} onChange={setActiveLang} />
+
               <div className="form-field">
-                <label htmlFor="name">Name</label>
-                <input id="name" name="name" value={form.name} onChange={handleChange} required />
+                <label htmlFor={`name_${activeLang}`}>
+                  Name{activeLang === 'en' ? ' (required — used as fallback)' : ''}
+                </label>
+                <input
+                  id={`name_${activeLang}`}
+                  name={`name_${activeLang}`}
+                  value={form[`name_${activeLang}`]}
+                  onChange={handleChange}
+                  required={activeLang === 'en'}
+                />
               </div>
               <div className="form-field">
-                <label htmlFor="address">Address</label>
-                <input id="address" name="address" value={form.address} onChange={handleChange} required />
+                <label htmlFor={`address_${activeLang}`}>Address</label>
+                <input
+                  id={`address_${activeLang}`}
+                  name={`address_${activeLang}`}
+                  value={form[`address_${activeLang}`]}
+                  onChange={handleChange}
+                />
               </div>
+
               <div className="form-field">
                 <label htmlFor="city">City</label>
                 <input id="city" name="city" value={form.city} onChange={handleChange} required />
@@ -183,7 +226,7 @@ export default function ManagePharmacies() {
       <ConfirmDialog
         open={Boolean(deleteTarget)}
         title="Delete pharmacy?"
-        message={`Are you sure you want to delete "${deleteTarget?.name}"? This cannot be undone.`}
+        message={`Are you sure you want to delete "${deleteTarget?.name_en}"? This cannot be undone.`}
         onConfirm={handleDelete}
         onCancel={() => setDeleteTarget(null)}
       />

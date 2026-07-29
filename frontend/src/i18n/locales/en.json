@@ -1,0 +1,95 @@
+{
+  "nav": {
+    "home": "Home",
+    "products": "Products",
+    "whereToBuy": "Where to Buy",
+    "about": "About",
+    "contact": "Contact"
+  },
+  "home": {
+    "eyebrow": "Natural Cosmetics",
+    "viewProducts": "View Products",
+    "whereToBuyCta": "Where to Buy",
+    "featuredEyebrow": "Featured",
+    "featuredTitle": "Our Signature Collection",
+    "loadingProducts": "Loading products…",
+    "noFeatured": "Featured products will appear here soon.",
+    "storyEyebrow": "Our Story",
+    "storyTitle": "Rooted in Nature, Refined by Science",
+    "storyText": "Black Nadya was founded on a simple belief: skincare should be both effective and honest. Discover the story behind our formulas and the people who make them.",
+    "readStory": "Read Our Story",
+    "howToBuyEyebrow": "How to Buy",
+    "howToBuyTitle": "Two Simple Ways to Get Black Nadya",
+    "cargoTitle": "Order via Cargo / Courier",
+    "cargoText": "Tell us what you'd like and where to send it — we'll arrange courier delivery directly to your door.",
+    "requestOrder": "Request an Order",
+    "pharmacyTitle": "Buy In-Person at a Pharmacy",
+    "pharmacyText": "Prefer to shop in person? Find a partner pharmacy near you that carries the full Black Nadya range.",
+    "findPharmacy": "Find a Pharmacy"
+  },
+  "products": {
+    "eyebrow": "Shop",
+    "title": "Our Products",
+    "all": "All",
+    "loading": "Loading products…",
+    "empty": "No products found in this category yet.",
+    "categorySerums": "Serums",
+    "categoryCreams": "Creams",
+    "categoryOils": "Oils"
+  },
+  "productDetail": {
+    "notFound": "We couldn't find that product.",
+    "backToProducts": "Back to Products",
+    "keyIngredients": "Key Ingredients",
+    "whereToBuyThis": "Where to Buy This"
+  },
+  "whereToBuy": {
+    "eyebrow": "Where to Buy",
+    "title": "Two Ways to Get Black Nadya",
+    "cargoTitle": "Order via Cargo / Courier",
+    "cargoIntro": "Fill out this form and our team will reach out to arrange payment and courier delivery. No online payment is processed here.",
+    "fullName": "Full Name",
+    "phone": "Phone",
+    "emailOptional": "Email (optional)",
+    "city": "City",
+    "address": "Address",
+    "productsWanted": "Product(s) Wanted",
+    "notesOptional": "Notes (optional)",
+    "submit": "Submit Order Request",
+    "submitting": "Sending…",
+    "successToast": "Order request sent! We'll contact you soon.",
+    "errorToast": "Something went wrong. Please try again.",
+    "nameRequired": "Name is required",
+    "phoneRequired": "Phone number is required",
+    "productsRequired": "Please list the product(s) you want",
+    "pharmacyTitle": "Buy In-Person at a Pharmacy",
+    "pharmacyIntro": "Black Nadya products are available at the following partner pharmacies.",
+    "loadingPharmacies": "Loading pharmacies…",
+    "noPharmacies": "Pharmacy locations coming soon.",
+    "viewOnMap": "View on map →"
+  },
+  "about": {
+    "eyebrow": "About Us",
+    "title": "Our Story",
+    "loading": "Loading…",
+    "comingSoon": "Our story is coming soon."
+  },
+  "contact": {
+    "eyebrow": "Contact",
+    "title": "Get in Touch",
+    "name": "Name",
+    "email": "Email",
+    "message": "Message",
+    "send": "Send Message",
+    "sending": "Sending…",
+    "successToast": "Message sent! We will get back to you shortly.",
+    "errorToast": "Something went wrong. Please try again.",
+    "nameRequired": "Name is required",
+    "emailRequired": "Email is required",
+    "messageRequired": "Please write a message",
+    "detailsTitle": "Contact Details"
+  },
+  "footer": {
+    "tagline": "Natural Cosmetics"
+  }
+}

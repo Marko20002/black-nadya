@@ -1,0 +1,95 @@
+{
+  "nav": {
+    "home": "Ballina",
+    "products": "Produktet",
+    "whereToBuy": "Ku të Blini",
+    "about": "Rreth Nesh",
+    "contact": "Kontakt"
+  },
+  "home": {
+    "eyebrow": "Kozmetikë Natyrale",
+    "viewProducts": "Shiko Produktet",
+    "whereToBuyCta": "Ku të Blini",
+    "featuredEyebrow": "Të Veçuara",
+    "featuredTitle": "Koleksioni Ynë Ekskluziv",
+    "loadingProducts": "Duke ngarkuar produktet…",
+    "noFeatured": "Produktet e veçuara do të shfaqen së shpejti këtu.",
+    "storyEyebrow": "Historia Jonë",
+    "storyTitle": "E Rrënjosur në Natyrë, e Përsosur nga Shkenca",
+    "storyText": "Black Nadya u themelua mbi një besim të thjeshtë: kujdesi për lëkurën duhet të jetë njëkohësisht efektiv dhe i ndershëm. Zbuloni historinë pas formulave tona dhe njerëzve që i krijojnë ato.",
+    "readStory": "Lexo Historinë Tonë",
+    "howToBuyEyebrow": "Si të Blini",
+    "howToBuyTitle": "Dy Mënyra të Thjeshta për të Marrë Black Nadya",
+    "cargoTitle": "Porosit me Kurier",
+    "cargoText": "Na tregoni çfarë dëshironi dhe ku ta dërgojmë — ne do të organizojmë dërgesën me kurier direkt te dera juaj.",
+    "requestOrder": "Kërko një Porosi",
+    "pharmacyTitle": "Bli Personalisht në një Farmaci",
+    "pharmacyText": "Preferoni të blini personalisht? Gjeni një farmaci partnere pranë jush që ofron gamën e plotë Black Nadya.",
+    "findPharmacy": "Gjej një Farmaci"
+  },
+  "products": {
+    "eyebrow": "Dyqani",
+    "title": "Produktet Tona",
+    "all": "Të Gjitha",
+    "loading": "Duke ngarkuar produktet…",
+    "empty": "Ende nuk ka produkte në këtë kategori.",
+    "categorySerums": "Serume",
+    "categoryCreams": "Kremra",
+    "categoryOils": "Vajra"
+  },
+  "productDetail": {
+    "notFound": "Nuk e gjetëm atë produkt.",
+    "backToProducts": "Kthehu te Produktet",
+    "keyIngredients": "Përbërësit Kryesorë",
+    "whereToBuyThis": "Ku ta Blini Këtë"
+  },
+  "whereToBuy": {
+    "eyebrow": "Ku të Blini",
+    "title": "Dy Mënyra për të Marrë Black Nadya",
+    "cargoTitle": "Porosit me Kurier",
+    "cargoIntro": "Plotësoni këtë formular dhe ekipi ynë do t'ju kontaktojë për të organizuar pagesën dhe dërgesën me kurier. Asnjë pagesë online nuk përpunohet këtu.",
+    "fullName": "Emri i Plotë",
+    "phone": "Telefoni",
+    "emailOptional": "Email (opsionale)",
+    "city": "Qyteti",
+    "address": "Adresa",
+    "productsWanted": "Produkti/et e Dëshiruar",
+    "notesOptional": "Shënime (opsionale)",
+    "submit": "Dërgo Kërkesën për Porosi",
+    "submitting": "Duke dërguar…",
+    "successToast": "Kërkesa për porosi u dërgua! Do t'ju kontaktojmë së shpejti.",
+    "errorToast": "Diçka shkoi keq. Ju lutemi provoni përsëri.",
+    "nameRequired": "Emri është i detyrueshëm",
+    "phoneRequired": "Numri i telefonit është i detyrueshëm",
+    "productsRequired": "Ju lutemi listoni produktin/et që dëshironi",
+    "pharmacyTitle": "Bli Personalisht në një Farmaci",
+    "pharmacyIntro": "Produktet Black Nadya janë të disponueshme në farmacitë partnere të mëposhtme.",
+    "loadingPharmacies": "Duke ngarkuar farmacitë…",
+    "noPharmacies": "Vendndodhjet e farmacive së shpejti.",
+    "viewOnMap": "Shiko në hartë →"
+  },
+  "about": {
+    "eyebrow": "Rreth Nesh",
+    "title": "Historia Jonë",
+    "loading": "Duke ngarkuar…",
+    "comingSoon": "Historia jonë vjen së shpejti."
+  },
+  "contact": {
+    "eyebrow": "Kontakt",
+    "title": "Na Kontaktoni",
+    "name": "Emri",
+    "email": "Email",
+    "message": "Mesazhi",
+    "send": "Dërgo Mesazhin",
+    "sending": "Duke dërguar…",
+    "successToast": "Mesazhi u dërgua! Do t'ju përgjigjemi së shpejti.",
+    "errorToast": "Diçka shkoi keq. Ju lutemi provoni përsëri.",
+    "nameRequired": "Emri është i detyrueshëm",
+    "emailRequired": "Email është i detyrueshëm",
+    "messageRequired": "Ju lutemi shkruani një mesazh",
+    "detailsTitle": "Të Dhënat e Kontaktit"
+  },
+  "footer": {
+    "tagline": "Kozmetikë Natyrale"
+  }
+}

@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 import { getPharmacies, submitOrderRequest } from '../api/resources';
+import { pickTranslated } from '../i18n/pickTranslated';
 import Loader from '../components/Loader';
 import './WhereToBuy.css';
 
@@ -15,6 +17,8 @@ const EMPTY_FORM = {
 };
 
 export default function WhereToBuy() {
+  const { t, i18n } = useTranslation();
+  const lang = i18n.language?.split('-')[0] || 'en';
   const [pharmacies, setPharmacies] = useState([]);
   const [loadingPharmacies, setLoadingPharmacies] = useState(true);
   const [form, setForm] = useState(EMPTY_FORM);
@@ -34,9 +38,9 @@ export default function WhereToBuy() {
 
   const validate = () => {
     const next = {};
-    if (!form.name.trim()) next.name = 'Name is required';
-    if (!form.phone.trim()) next.phone = 'Phone number is required';
-    if (!form.products_wanted.trim()) next.products_wanted = 'Please list the product(s) you want';
+    if (!form.name.trim()) next.name = t('whereToBuy.nameRequired');
+    if (!form.phone.trim()) next.phone = t('whereToBuy.phoneRequired');
+    if (!form.products_wanted.trim()) next.products_wanted = t('whereToBuy.productsRequired');
     setErrors(next);
     return Object.keys(next).length === 0;
   };
@@ -47,11 +51,11 @@ export default function WhereToBuy() {
     setSubmitting(true);
     try {
       await submitOrderRequest(form);
-      toast.success("Order request sent! We'll contact you soon.");
+      toast.success(t('whereToBuy.successToast'));
       setForm(EMPTY_FORM);
       setErrors({});
     } catch {
-      toast.error('Something went wrong. Please try again.');
+      toast.error(t('whereToBuy.errorToast'));
     } finally {
       setSubmitting(false);
     }
@@ -60,42 +64,39 @@ export default function WhereToBuy() {
   return (
     <div className="section">
       <div className="container">
-        <span className="eyebrow">Where to Buy</span>
-        <h1>Two Ways to Get Black Nadya</h1>
+        <span className="eyebrow">{t('whereToBuy.eyebrow')}</span>
+        <h1>{t('whereToBuy.title')}</h1>
         <hr className="rule-gold" />
 
         <div className="where-to-buy">
           <div className="card where-to-buy__panel">
-            <h2>Order via Cargo / Courier</h2>
-            <p className="where-to-buy__intro">
-              Fill out this form and our team will reach out to arrange payment and courier
-              delivery. No online payment is processed here.
-            </p>
+            <h2>{t('whereToBuy.cargoTitle')}</h2>
+            <p className="where-to-buy__intro">{t('whereToBuy.cargoIntro')}</p>
             <form onSubmit={handleSubmit} noValidate>
               <div className="form-field">
-                <label htmlFor="name">Full Name</label>
+                <label htmlFor="name">{t('whereToBuy.fullName')}</label>
                 <input id="name" name="name" value={form.name} onChange={handleChange} />
                 {errors.name && <span className="form-field-error">{errors.name}</span>}
               </div>
               <div className="form-field">
-                <label htmlFor="phone">Phone</label>
+                <label htmlFor="phone">{t('whereToBuy.phone')}</label>
                 <input id="phone" name="phone" value={form.phone} onChange={handleChange} />
                 {errors.phone && <span className="form-field-error">{errors.phone}</span>}
               </div>
               <div className="form-field">
-                <label htmlFor="email">Email (optional)</label>
+                <label htmlFor="email">{t('whereToBuy.emailOptional')}</label>
                 <input id="email" name="email" type="email" value={form.email} onChange={handleChange} />
               </div>
               <div className="form-field">
-                <label htmlFor="city">City</label>
+                <label htmlFor="city">{t('whereToBuy.city')}</label>
                 <input id="city" name="city" value={form.city} onChange={handleChange} />
               </div>
               <div className="form-field">
-                <label htmlFor="address">Address</label>
+                <label htmlFor="address">{t('whereToBuy.address')}</label>
                 <input id="address" name="address" value={form.address} onChange={handleChange} />
               </div>
               <div className="form-field">
-                <label htmlFor="products_wanted">Product(s) Wanted</label>
+                <label htmlFor="products_wanted">{t('whereToBuy.productsWanted')}</label>
                 <textarea
                   id="products_wanted"
                   name="products_wanted"
@@ -106,41 +107,39 @@ export default function WhereToBuy() {
                 {errors.products_wanted && <span className="form-field-error">{errors.products_wanted}</span>}
               </div>
               <div className="form-field">
-                <label htmlFor="notes">Notes (optional)</label>
+                <label htmlFor="notes">{t('whereToBuy.notesOptional')}</label>
                 <textarea id="notes" name="notes" rows={3} value={form.notes} onChange={handleChange} />
               </div>
               <button type="submit" className="btn btn--gold" disabled={submitting}>
-                {submitting ? 'Sending…' : 'Submit Order Request'}
+                {submitting ? t('whereToBuy.submitting') : t('whereToBuy.submit')}
               </button>
             </form>
           </div>
 
           <div className="card where-to-buy__panel">
-            <h2>Buy In-Person at a Pharmacy</h2>
-            <p className="where-to-buy__intro">
-              Black Nadya products are available at the following partner pharmacies.
-            </p>
+            <h2>{t('whereToBuy.pharmacyTitle')}</h2>
+            <p className="where-to-buy__intro">{t('whereToBuy.pharmacyIntro')}</p>
             {loadingPharmacies ? (
-              <Loader label="Loading pharmacies…" />
+              <Loader label={t('whereToBuy.loadingPharmacies')} />
             ) : pharmacies.length > 0 ? (
               <ul className="pharmacy-list">
                 {pharmacies.map((pharmacy) => (
                   <li key={pharmacy.id} className="pharmacy-list__item">
-                    <h4>{pharmacy.name}</h4>
+                    <h4>{pickTranslated(pharmacy, 'name', lang)}</h4>
                     <p>
-                      {pharmacy.address}, {pharmacy.city}
+                      {pickTranslated(pharmacy, 'address', lang)}, {pharmacy.city}
                     </p>
                     {pharmacy.phone && <p>{pharmacy.phone}</p>}
                     {pharmacy.map_link && (
                       <a href={pharmacy.map_link} target="_blank" rel="noreferrer" className="pharmacy-list__map">
-                        View on map →
+                        {t('whereToBuy.viewOnMap')}
                       </a>
                     )}
                   </li>
                 ))}
               </ul>
             ) : (
-              <p>Pharmacy locations coming soon.</p>
+              <p>{t('whereToBuy.noPharmacies')}</p>
             )}
           </div>
         </div>

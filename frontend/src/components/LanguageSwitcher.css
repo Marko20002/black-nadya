@@ -1,0 +1,25 @@
+.language-switcher {
+  display: flex;
+  gap: 4px;
+  border: 1px solid var(--color-gold);
+  border-radius: 20px;
+  padding: 3px;
+}
+
+.language-switcher__btn {
+  background: transparent;
+  border: none;
+  color: var(--color-offwhite);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 4px 10px;
+  border-radius: 16px;
+  transition: all var(--transition);
+}
+
+.language-switcher__btn--active,
+.language-switcher__btn:hover {
+  background: var(--color-gold);
+  color: var(--color-black);
+}

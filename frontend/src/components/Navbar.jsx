@@ -1,17 +1,20 @@
 import { NavLink } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useSiteSettings } from '../hooks/useSiteSettings';
+import LanguageSwitcher from './LanguageSwitcher';
 import './Navbar.css';
 
 const LINKS = [
-  { to: '/', label: 'Home' },
-  { to: '/products', label: 'Products' },
-  { to: '/where-to-buy', label: 'Where to Buy' },
-  { to: '/about', label: 'About' },
-  { to: '/contact', label: 'Contact' },
+  { to: '/', key: 'home' },
+  { to: '/products', key: 'products' },
+  { to: '/where-to-buy', key: 'whereToBuy' },
+  { to: '/about', key: 'about' },
+  { to: '/contact', key: 'contact' },
 ];
 
 export default function Navbar() {
   const { settings } = useSiteSettings();
+  const { t } = useTranslation();
 
   return (
     <header className="navbar">
@@ -31,10 +34,11 @@ export default function Navbar() {
               end={link.to === '/'}
               className={({ isActive }) => `navbar__link${isActive ? ' navbar__link--active' : ''}`}
             >
-              {link.label}
+              {t(`nav.${link.key}`)}
             </NavLink>
           ))}
         </nav>
+        <LanguageSwitcher />
       </div>
     </header>
   );

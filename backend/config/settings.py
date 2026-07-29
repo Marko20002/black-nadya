@@ -2,23 +2,31 @@
 Django settings for the Black Nadya project.
 """
 
-import os
 from datetime import timedelta
 from pathlib import Path
 
+import environ
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.environ.get(
+env = environ.Env(
+    DJANGO_DEBUG=(bool, True),
+)
+environ.Env.read_env(BASE_DIR / '.env')
+
+SECRET_KEY = env(
     'DJANGO_SECRET_KEY',
-    'django-insecure-=_e8(#^fmcbxe&96m21$10y!l44cr%z!7j$voz4$mwq3@8x!^6',
+    default='django-insecure-=_e8(#^fmcbxe&96m21$10y!l44cr%z!7j$voz4$mwq3@8x!^6',
 )
 
-DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'True'
+DEBUG = env('DJANGO_DEBUG')
 
-ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', '*').split(',')
+ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=['*'])
 
 
 INSTALLED_APPS = [
+    'modeltranslation',
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -37,6 +45,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -67,27 +76,13 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 
 # Database
-# Uses SQLite locally by default. Set DATABASE_URL-style env vars (or
-# DJANGO_DB_* below) to switch to Postgres in production.
+# Reads DATABASE_URL (e.g. postgres://user:pass@host:port/dbname) when set —
+# this is what Railway injects automatically once a Postgres plugin is
+# attached. Falls back to local SQLite when DATABASE_URL is not set.
 
-if os.environ.get('DJANGO_DB_ENGINE') == 'postgres':
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.environ.get('DJANGO_DB_NAME', 'blacknadya'),
-            'USER': os.environ.get('DJANGO_DB_USER', 'blacknadya'),
-            'PASSWORD': os.environ.get('DJANGO_DB_PASSWORD', ''),
-            'HOST': os.environ.get('DJANGO_DB_HOST', 'localhost'),
-            'PORT': os.environ.get('DJANGO_DB_PORT', '5432'),
-        }
-    }
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
-    }
+DATABASES = {
+    'default': env.db('DATABASE_URL', default=f'sqlite:///{BASE_DIR / "db.sqlite3"}'),
+}
 
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -98,16 +93,55 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-LANGUAGE_CODE = 'en-us'
+# Internationalization
+# Site content (products, About Us, pharmacies, contact info, homepage
+# tagline) is translated into these three languages via django-modeltranslation.
+
+LANGUAGE_CODE = 'en'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
+LANGUAGES = [
+    ('en', 'English'),
+    ('mk', 'Macedonian'),
+    ('sq', 'Albanian'),
+]
+
+MODELTRANSLATION_LANGUAGES = ('en', 'mk', 'sq')
+MODELTRANSLATION_DEFAULT_LANGUAGE = 'en'
+MODELTRANSLATION_FALLBACK_LANGUAGES = ('en',)
+
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STORAGES = {
+    'staticfiles': {
+        'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+    },
+}
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+# Media storage: Cloudflare R2 (S3-compatible) in production when USE_S3 is
+# set, local filesystem storage otherwise. R2 credentials come from a
+# Cloudflare API token scoped to the bucket; see backend/.env.example.
+USE_S3 = env.bool('USE_S3', default=False)
+
+if USE_S3:
+    STORAGES['default'] = {'BACKEND': 'storages.backends.s3.S3Storage'}
+
+    AWS_ACCESS_KEY_ID = env('AWS_ACCESS_KEY_ID')
+    AWS_SECRET_ACCESS_KEY = env('AWS_SECRET_ACCESS_KEY')
+    AWS_STORAGE_BUCKET_NAME = env('AWS_STORAGE_BUCKET_NAME')
+    AWS_S3_ENDPOINT_URL = env('AWS_S3_ENDPOINT_URL')  # e.g. https://<account_id>.r2.cloudflarestorage.com
+    AWS_S3_CUSTOM_DOMAIN = env('AWS_S3_CUSTOM_DOMAIN', default=None)  # e.g. media.blacknadya.com
+    AWS_S3_ADDRESSING_STYLE = 'virtual'
+    AWS_DEFAULT_ACL = None
+    AWS_QUERYSTRING_AUTH = False
+else:
+    STORAGES['default'] = {'BACKEND': 'django.core.files.storage.FileSystemStorage'}
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -133,7 +167,11 @@ SIMPLE_JWT = {
     'ROTATE_REFRESH_TOKENS': True,
 }
 
-CORS_ALLOWED_ORIGINS = os.environ.get(
+CORS_ALLOWED_ORIGINS = env.list(
     'DJANGO_CORS_ALLOWED_ORIGINS',
-    'http://localhost:5173,http://127.0.0.1:5173',
-).split(',')
+    default=['http://localhost:5173', 'http://127.0.0.1:5173'],
+)
+
+# HTTPS is terminated by Railway's edge proxy in production; trust its
+# forwarded-proto header so Django knows the original request was secure.
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')

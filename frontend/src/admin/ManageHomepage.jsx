@@ -2,10 +2,12 @@ import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { adminSiteSettings } from '../api/resources';
 import ImageDropzone from './components/ImageDropzone';
+import LangTabs from './components/LangTabs';
 
 export default function ManageHomepage() {
   const [settings, setSettings] = useState(null);
-  const [tagline, setTagline] = useState('');
+  const [tagline, setTagline] = useState({ en: '', mk: '', sq: '' });
+  const [activeLang, setActiveLang] = useState('en');
   const [backgroundFile, setBackgroundFile] = useState(null);
   const [logoFile, setLogoFile] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -16,7 +18,11 @@ export default function ManageHomepage() {
       .get()
       .then((data) => {
         setSettings(data);
-        setTagline(data.hero_tagline || '');
+        setTagline({
+          en: data.hero_tagline_en || '',
+          mk: data.hero_tagline_mk || '',
+          sq: data.hero_tagline_sq || '',
+        });
       })
       .catch(() => toast.error('Failed to load homepage settings.'))
       .finally(() => setLoading(false));
@@ -25,7 +31,11 @@ export default function ManageHomepage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSaving(true);
-    const payload = { hero_tagline: tagline };
+    const payload = {
+      hero_tagline_en: tagline.en,
+      hero_tagline_mk: tagline.mk,
+      hero_tagline_sq: tagline.sq,
+    };
     if (backgroundFile) payload.hero_background_image = backgroundFile;
     if (logoFile) payload.logo_image = logoFile;
     try {
@@ -59,9 +69,13 @@ export default function ManageHomepage() {
           onFileSelected={setLogoFile}
         />
 
+        <label>Hero Tagline</label>
+        <LangTabs active={activeLang} onChange={setActiveLang} />
         <div className="form-field">
-          <label htmlFor="tagline">Hero Tagline</label>
-          <input id="tagline" value={tagline} onChange={(e) => setTagline(e.target.value)} />
+          <input
+            value={tagline[activeLang]}
+            onChange={(e) => setTagline({ ...tagline, [activeLang]: e.target.value })}
+          />
         </div>
 
         <button type="submit" className="btn btn--gold" disabled={saving}>

@@ -8,28 +8,28 @@ class ProductPublicApiTests(APITestCase):
     def setUp(self):
         self.category = Category.objects.create(name='Serums')
         self.active_product = Product.objects.create(
-            name='Radiance Serum', category=self.category, is_active=True,
+            name_en='Radiance Serum', category=self.category, is_active=True,
         )
-        Product.objects.create(name='Discontinued Serum', category=self.category, is_active=False)
+        Product.objects.create(name_en='Discontinued Serum', category=self.category, is_active=False)
 
     def test_list_only_returns_active_products(self):
         response = self.client.get('/api/products/')
         self.assertEqual(response.status_code, 200)
-        names = [p['name'] for p in response.data]
+        names = [p['name_en'] for p in response.data]
         self.assertIn('Radiance Serum', names)
         self.assertNotIn('Discontinued Serum', names)
 
     def test_retrieve_by_slug(self):
         response = self.client.get(f'/api/products/{self.active_product.slug}/')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['name'], 'Radiance Serum')
+        self.assertEqual(response.data['name_en'], 'Radiance Serum')
 
     def test_category_filter(self):
         other_category = Category.objects.create(name='Oils')
-        Product.objects.create(name='Rosehip Oil', category=other_category, is_active=True)
+        Product.objects.create(name_en='Rosehip Oil', category=other_category, is_active=True)
         response = self.client.get('/api/products/', {'category': other_category.slug})
         self.assertEqual(response.status_code, 200)
-        names = [p['name'] for p in response.data]
+        names = [p['name_en'] for p in response.data]
         self.assertEqual(names, ['Rosehip Oil'])
 
 
@@ -48,6 +48,6 @@ class ProductAdminApiTests(APITestCase):
         self.assertEqual(token_response.status_code, 200)
         access = token_response.data['access']
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {access}')
-        response = self.client.post('/api/admin/products/', {'name': 'New Product'}, format='json')
+        response = self.client.post('/api/admin/products/', {'name_en': 'New Product'}, format='json')
         self.assertEqual(response.status_code, 201)
-        self.assertTrue(Product.objects.filter(name='New Product').exists())
+        self.assertTrue(Product.objects.filter(name_en='New Product').exists())

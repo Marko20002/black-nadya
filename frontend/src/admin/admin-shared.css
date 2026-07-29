@@ -174,6 +174,28 @@
   color: var(--color-text-muted);
 }
 
+.lang-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.lang-tabs__btn {
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid var(--color-border);
+  background: var(--color-white);
+  font-size: 0.78rem;
+  transition: all var(--transition);
+}
+
+.lang-tabs__btn--active {
+  border-color: var(--color-gold);
+  background: var(--color-gold);
+  color: var(--color-black);
+  font-weight: 700;
+}
+
 .status-select {
   padding: 6px 10px;
   border-radius: var(--radius);

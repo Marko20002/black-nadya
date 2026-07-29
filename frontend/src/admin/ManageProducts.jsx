@@ -3,17 +3,20 @@ import toast from 'react-hot-toast';
 import { adminCategories, adminProducts } from '../api/resources';
 import ConfirmDialog from '../components/ConfirmDialog';
 import ImageDropzone from './components/ImageDropzone';
+import LangTabs from './components/LangTabs';
 
-const EMPTY_FORM = {
-  name: '',
-  category: '',
-  short_description: '',
-  full_description: '',
-  ingredients: '',
-  size: '',
-  is_featured: false,
-  is_active: true,
-};
+const TRANSLATED_BASES = ['name', 'short_description', 'full_description', 'ingredients'];
+const LANGS = ['en', 'mk', 'sq'];
+
+function emptyForm() {
+  const form = { category: '', size: '', is_featured: false, is_active: true };
+  TRANSLATED_BASES.forEach((base) => {
+    LANGS.forEach((lang) => {
+      form[`${base}_${lang}`] = '';
+    });
+  });
+  return form;
+}
 
 export default function ManageProducts() {
   const [products, setProducts] = useState([]);
@@ -21,7 +24,8 @@ export default function ManageProducts() {
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState(null);
-  const [form, setForm] = useState(EMPTY_FORM);
+  const [form, setForm] = useState(emptyForm());
+  const [activeLang, setActiveLang] = useState('en');
   const [imageFile, setImageFile] = useState(null);
   const [saving, setSaving] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState('');
@@ -43,23 +47,22 @@ export default function ManageProducts() {
 
   const openAdd = () => {
     setEditing(null);
-    setForm(EMPTY_FORM);
+    setForm(emptyForm());
+    setActiveLang('en');
     setImageFile(null);
     setModalOpen(true);
   };
 
   const openEdit = (product) => {
     setEditing(product);
-    setForm({
-      name: product.name,
-      category: product.category || '',
-      short_description: product.short_description,
-      full_description: product.full_description,
-      ingredients: product.ingredients,
-      size: product.size,
-      is_featured: product.is_featured,
-      is_active: product.is_active,
+    const next = { category: product.category || '', size: product.size, is_featured: product.is_featured, is_active: product.is_active };
+    TRANSLATED_BASES.forEach((base) => {
+      LANGS.forEach((lang) => {
+        next[`${base}_${lang}`] = product[`${base}_${lang}`] || '';
+      });
     });
+    setForm(next);
+    setActiveLang('en');
     setImageFile(null);
     setModalOpen(true);
   };
@@ -158,7 +161,7 @@ export default function ManageProducts() {
                       <div className="admin-table__thumb" />
                     )}
                   </td>
-                  <td>{product.name}</td>
+                  <td>{product.name_en}</td>
                   <td>{product.category_name || '—'}</td>
                   <td>
                     {product.is_featured && <span className="admin-badge admin-badge--gold">Featured</span>}
@@ -195,11 +198,6 @@ export default function ManageProducts() {
             <h2>{editing ? 'Edit Product' : 'Add Product'}</h2>
             <form onSubmit={handleSubmit}>
               <div className="form-field">
-                <label htmlFor="name">Name</label>
-                <input id="name" name="name" value={form.name} onChange={handleChange} required />
-              </div>
-
-              <div className="form-field">
                 <label htmlFor="category">Category</label>
                 <select id="category" name="category" value={form.category} onChange={handleChange}>
                   <option value="">— Select category —</option>
@@ -227,41 +225,57 @@ export default function ManageProducts() {
               </div>
 
               <div className="form-field">
-                <label htmlFor="short_description">Short Description</label>
-                <textarea
-                  id="short_description"
-                  name="short_description"
-                  rows={2}
-                  value={form.short_description}
-                  onChange={handleChange}
-                />
-              </div>
-
-              <div className="form-field">
-                <label htmlFor="full_description">Full Description</label>
-                <textarea
-                  id="full_description"
-                  name="full_description"
-                  rows={4}
-                  value={form.full_description}
-                  onChange={handleChange}
-                />
-              </div>
-
-              <div className="form-field">
-                <label htmlFor="ingredients">Ingredients (comma-separated)</label>
-                <textarea
-                  id="ingredients"
-                  name="ingredients"
-                  rows={2}
-                  value={form.ingredients}
-                  onChange={handleChange}
-                />
-              </div>
-
-              <div className="form-field">
                 <label htmlFor="size">Size</label>
                 <input id="size" name="size" placeholder="e.g. 30ml" value={form.size} onChange={handleChange} />
+              </div>
+
+              <label>Translated Content</label>
+              <LangTabs active={activeLang} onChange={setActiveLang} />
+
+              <div className="form-field">
+                <label htmlFor={`name_${activeLang}`}>
+                  Name{activeLang === 'en' ? ' (required — used as fallback)' : ''}
+                </label>
+                <input
+                  id={`name_${activeLang}`}
+                  name={`name_${activeLang}`}
+                  value={form[`name_${activeLang}`]}
+                  onChange={handleChange}
+                  required={activeLang === 'en'}
+                />
+              </div>
+
+              <div className="form-field">
+                <label htmlFor={`short_description_${activeLang}`}>Short Description</label>
+                <textarea
+                  id={`short_description_${activeLang}`}
+                  name={`short_description_${activeLang}`}
+                  rows={2}
+                  value={form[`short_description_${activeLang}`]}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div className="form-field">
+                <label htmlFor={`full_description_${activeLang}`}>Full Description</label>
+                <textarea
+                  id={`full_description_${activeLang}`}
+                  name={`full_description_${activeLang}`}
+                  rows={4}
+                  value={form[`full_description_${activeLang}`]}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div className="form-field">
+                <label htmlFor={`ingredients_${activeLang}`}>Ingredients (comma-separated)</label>
+                <textarea
+                  id={`ingredients_${activeLang}`}
+                  name={`ingredients_${activeLang}`}
+                  rows={2}
+                  value={form[`ingredients_${activeLang}`]}
+                  onChange={handleChange}
+                />
               </div>
 
               <ImageDropzone
@@ -308,7 +322,7 @@ export default function ManageProducts() {
       <ConfirmDialog
         open={Boolean(deleteTarget)}
         title="Delete product?"
-        message={`Are you sure you want to delete "${deleteTarget?.name}"? This cannot be undone.`}
+        message={`Are you sure you want to delete "${deleteTarget?.name_en}"? This cannot be undone.`}
         onConfirm={handleDelete}
         onCancel={() => setDeleteTarget(null)}
       />

@@ -1,10 +1,16 @@
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useSiteSettings } from '../hooks/useSiteSettings';
+import { pickTranslated } from '../i18n/pickTranslated';
 import './Footer.css';
 
 export default function Footer() {
   const { settings } = useSiteSettings();
+  const { t, i18n } = useTranslation();
+  const lang = i18n.language?.split('-')[0] || 'en';
   const social = settings?.social_links || {};
+
+  const footerText = pickTranslated(settings, 'footer_text', lang) || `© ${new Date().getFullYear()} Black Nadya. All rights reserved.`;
 
   return (
     <footer className="footer">
@@ -15,14 +21,14 @@ export default function Footer() {
           ) : (
             <span className="footer__brand-text">BLACK NADYA</span>
           )}
-          <p className="footer__tagline">Natural Cosmetics</p>
+          <p className="footer__tagline">{t('footer.tagline')}</p>
         </div>
 
         <div className="footer__links">
-          <Link to="/products">Products</Link>
-          <Link to="/where-to-buy">Where to Buy</Link>
-          <Link to="/about">About</Link>
-          <Link to="/contact">Contact</Link>
+          <Link to="/products">{t('nav.products')}</Link>
+          <Link to="/where-to-buy">{t('nav.whereToBuy')}</Link>
+          <Link to="/about">{t('nav.about')}</Link>
+          <Link to="/contact">{t('nav.contact')}</Link>
         </div>
 
         <div className="footer__social">
@@ -34,7 +40,7 @@ export default function Footer() {
         </div>
       </div>
       <div className="footer__bottom">
-        <p>{settings?.footer_text || `© ${new Date().getFullYear()} Black Nadya. All rights reserved.`}</p>
+        <p>{footerText}</p>
       </div>
     </footer>
   );

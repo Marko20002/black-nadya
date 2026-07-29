@@ -2,6 +2,13 @@ from rest_framework import serializers
 
 from .models import Category, Product, ProductImage
 
+TRANSLATED_FIELDS = [
+    'name_en', 'name_mk', 'name_sq',
+    'short_description_en', 'short_description_mk', 'short_description_sq',
+    'full_description_en', 'full_description_mk', 'full_description_sq',
+    'ingredients_en', 'ingredients_mk', 'ingredients_sq',
+]
+
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
@@ -21,8 +28,8 @@ class ProductListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = [
-            'id', 'name', 'slug', 'category', 'short_description',
-            'ingredients', 'size', 'image', 'is_featured',
+            'id', 'slug', 'category', 'size', 'image', 'is_featured',
+            *TRANSLATED_FIELDS,
         ]
 
 
@@ -33,9 +40,9 @@ class ProductDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = [
-            'id', 'name', 'slug', 'category', 'short_description',
-            'full_description', 'ingredients', 'size', 'image',
+            'id', 'slug', 'category', 'size', 'image',
             'gallery_images', 'is_featured', 'created_at',
+            *TRANSLATED_FIELDS,
         ]
 
 
@@ -46,9 +53,14 @@ class ProductAdminSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = [
-            'id', 'name', 'slug', 'category', 'category_name',
-            'short_description', 'full_description', 'ingredients', 'size',
+            'id', 'slug', 'category', 'category_name', 'size',
             'image', 'gallery_images', 'is_featured', 'is_active',
             'created_at', 'updated_at',
+            *TRANSLATED_FIELDS,
         ]
         read_only_fields = ['slug', 'created_at', 'updated_at']
+
+    def validate_name_en(self, value):
+        if not value.strip():
+            raise serializers.ValidationError('English name is required (used as the fallback and for the URL slug).')
+        return value

@@ -1,10 +1,11 @@
 from django.contrib import admin
+from modeltranslation.admin import TranslationAdmin
 
 from .models import SiteSettings
 
 
 @admin.register(SiteSettings)
-class SiteSettingsAdmin(admin.ModelAdmin):
+class SiteSettingsAdmin(TranslationAdmin):
     list_display = ('__str__', 'updated_at')
 
     def has_add_permission(self, request):

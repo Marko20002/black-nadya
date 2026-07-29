@@ -1,13 +1,17 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useSiteSettings } from '../hooks/useSiteSettings';
 import { getProducts } from '../api/resources';
+import { pickTranslated } from '../i18n/pickTranslated';
 import ProductCard from '../components/ProductCard';
 import Loader from '../components/Loader';
 import './Home.css';
 
 export default function Home() {
   const { settings, loading: settingsLoading } = useSiteSettings();
+  const { t, i18n } = useTranslation();
+  const lang = i18n.language?.split('-')[0] || 'en';
   const [featured, setFeatured] = useState([]);
   const [loadingProducts, setLoadingProducts] = useState(true);
 
@@ -22,6 +26,8 @@ export default function Home() {
     ? { backgroundImage: `linear-gradient(rgba(13,13,13,0.55), rgba(13,13,13,0.75)), url(${settings.hero_background_image})` }
     : undefined;
 
+  const tagline = pickTranslated(settings, 'hero_tagline', lang) || 'Pure. Natural. Radiant.';
+
   return (
     <div>
       <section className="hero" style={heroStyle}>
@@ -29,17 +35,15 @@ export default function Home() {
           {settings?.logo_image && (
             <img src={settings.logo_image} alt="Black Nadya" className="hero__logo" />
           )}
-          <span className="eyebrow">Natural Cosmetics</span>
+          <span className="eyebrow">{t('home.eyebrow')}</span>
           <h1 className="hero__title">Black Nadya</h1>
-          <p className="hero__tagline">
-            {settingsLoading ? '' : settings?.hero_tagline || 'Pure. Natural. Radiant.'}
-          </p>
+          <p className="hero__tagline">{settingsLoading ? '' : tagline}</p>
           <div className="hero__actions">
             <Link to="/products" className="btn btn--gold">
-              View Products
+              {t('home.viewProducts')}
             </Link>
             <Link to="/where-to-buy" className="btn btn--outline">
-              Where to Buy
+              {t('home.whereToBuyCta')}
             </Link>
           </div>
         </div>
@@ -47,11 +51,11 @@ export default function Home() {
 
       <section className="section">
         <div className="container">
-          <span className="eyebrow">Featured</span>
-          <h2>Our Signature Collection</h2>
+          <span className="eyebrow">{t('home.featuredEyebrow')}</span>
+          <h2>{t('home.featuredTitle')}</h2>
           <hr className="rule-gold" />
           {loadingProducts ? (
-            <Loader label="Loading products…" />
+            <Loader label={t('home.loadingProducts')} />
           ) : featured.length > 0 ? (
             <div className="product-grid">
               {featured.map((product) => (
@@ -59,7 +63,7 @@ export default function Home() {
               ))}
             </div>
           ) : (
-            <p>Featured products will appear here soon.</p>
+            <p>{t('home.noFeatured')}</p>
           )}
         </div>
       </section>
@@ -67,14 +71,11 @@ export default function Home() {
       <section className="section section--dark">
         <div className="container about-teaser">
           <div>
-            <span className="eyebrow">Our Story</span>
-            <h2>Rooted in Nature, Refined by Science</h2>
-            <p>
-              Black Nadya was founded on a simple belief: skincare should be both effective and
-              honest. Discover the story behind our formulas and the people who make them.
-            </p>
+            <span className="eyebrow">{t('home.storyEyebrow')}</span>
+            <h2>{t('home.storyTitle')}</h2>
+            <p>{t('home.storyText')}</p>
             <Link to="/about" className="btn btn--outline">
-              Read Our Story
+              {t('home.readStory')}
             </Link>
           </div>
         </div>
@@ -82,28 +83,22 @@ export default function Home() {
 
       <section className="section">
         <div className="container">
-          <span className="eyebrow">How to Buy</span>
-          <h2>Two Simple Ways to Get Black Nadya</h2>
+          <span className="eyebrow">{t('home.howToBuyEyebrow')}</span>
+          <h2>{t('home.howToBuyTitle')}</h2>
           <hr className="rule-gold" />
           <div className="how-to-buy">
             <div className="card how-to-buy__option">
-              <h3>Order via Cargo / Courier</h3>
-              <p>
-                Tell us what you'd like and where to send it — we'll arrange courier delivery
-                directly to your door.
-              </p>
+              <h3>{t('home.cargoTitle')}</h3>
+              <p>{t('home.cargoText')}</p>
               <Link to="/where-to-buy" className="btn btn--outline-dark">
-                Request an Order
+                {t('home.requestOrder')}
               </Link>
             </div>
             <div className="card how-to-buy__option">
-              <h3>Buy In-Person at a Pharmacy</h3>
-              <p>
-                Prefer to shop in person? Find a partner pharmacy near you that carries the full
-                Black Nadya range.
-              </p>
+              <h3>{t('home.pharmacyTitle')}</h3>
+              <p>{t('home.pharmacyText')}</p>
               <Link to="/where-to-buy" className="btn btn--outline-dark">
-                Find a Pharmacy
+                {t('home.findPharmacy')}
               </Link>
             </div>
           </div>

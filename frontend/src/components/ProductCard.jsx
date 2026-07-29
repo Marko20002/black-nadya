@@ -1,10 +1,20 @@
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { pickTranslated } from '../i18n/pickTranslated';
+import { categoryLabel } from '../i18n/categoryLabel';
 import './ProductCard.css';
 
 export default function ProductCard({ product }) {
-  const tags = (product.ingredients || '')
+  const { t, i18n } = useTranslation();
+  const lang = i18n.language?.split('-')[0] || 'en';
+
+  const name = pickTranslated(product, 'name', lang);
+  const shortDescription = pickTranslated(product, 'short_description', lang);
+  const ingredients = pickTranslated(product, 'ingredients', lang);
+
+  const tags = ingredients
     .split(',')
-    .map((t) => t.trim())
+    .map((tag) => tag.trim())
     .filter(Boolean)
     .slice(0, 3);
 
@@ -12,15 +22,15 @@ export default function ProductCard({ product }) {
     <Link to={`/products/${product.slug}`} className="product-card">
       <div className="product-card__image-wrap">
         {product.image ? (
-          <img src={product.image} alt={product.name} className="product-card__image" />
+          <img src={product.image} alt={name} className="product-card__image" />
         ) : (
           <div className="product-card__placeholder" />
         )}
       </div>
       <div className="product-card__body">
-        {product.category?.name && <span className="eyebrow">{product.category.name}</span>}
-        <h3 className="product-card__name">{product.name}</h3>
-        <p className="product-card__desc">{product.short_description}</p>
+        {product.category && <span className="eyebrow">{categoryLabel(product.category, t)}</span>}
+        <h3 className="product-card__name">{name}</h3>
+        <p className="product-card__desc">{shortDescription}</p>
         {tags.length > 0 && (
           <div className="product-card__tags">
             {tags.map((tag) => (
