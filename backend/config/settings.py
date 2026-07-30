@@ -162,11 +162,13 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.AllowAny',
     ),
-    'DEFAULT_THROTTLE_CLASSES': (
-        'rest_framework.throttling.AnonRateThrottle',
-    ),
+    # No default throttle classes: general browsing (site-settings, products,
+    # pharmacies, etc.) is unthrottled. Only views that opt in explicitly via
+    # their own `throttle_classes` (e.g. the order-request/contact-message
+    # inquiry forms — see inquiries/views.py) are rate limited, each under
+    # its own scope below so they don't share a bucket with browsing traffic.
     'DEFAULT_THROTTLE_RATES': {
-        'anon': '20/minute',
+        'inquiry': '10/hour',
     },
 }
 

@@ -36,8 +36,10 @@ export default function Contact() {
       toast.success(t('contact.successToast'));
       setForm(EMPTY_FORM);
       setErrors({});
-    } catch {
-      toast.error(t('contact.errorToast'));
+    } catch (err) {
+      const message =
+        err?.response?.status === 429 ? t('contact.tooManyRequestsToast') : t('contact.errorToast');
+      toast.error(message);
     } finally {
       setSubmitting(false);
     }

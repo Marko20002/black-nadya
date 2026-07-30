@@ -54,8 +54,10 @@ export default function WhereToBuy() {
       toast.success(t('whereToBuy.successToast'));
       setForm(EMPTY_FORM);
       setErrors({});
-    } catch {
-      toast.error(t('whereToBuy.errorToast'));
+    } catch (err) {
+      const message =
+        err?.response?.status === 429 ? t('whereToBuy.tooManyRequestsToast') : t('whereToBuy.errorToast');
+      toast.error(message);
     } finally {
       setSubmitting(false);
     }

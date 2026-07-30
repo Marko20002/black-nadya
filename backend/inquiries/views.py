@@ -12,7 +12,11 @@ from .serializers import (
 
 
 class InquiryCreateThrottle(AnonRateThrottle):
-    rate = '10/hour'
+    # A distinct scope (rather than inheriting AnonRateThrottle's shared
+    # "anon" scope) so request history here doesn't mix with — or get
+    # crowded out by — plain browsing traffic on other endpoints. The rate
+    # itself is configured via REST_FRAMEWORK['DEFAULT_THROTTLE_RATES'].
+    scope = 'inquiry'
 
 
 class OrderRequestCreateViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
