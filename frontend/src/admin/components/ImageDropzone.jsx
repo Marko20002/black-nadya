@@ -3,10 +3,12 @@ import { useState } from 'react';
 export default function ImageDropzone({ label, currentImageUrl, onFileSelected }) {
   const [preview, setPreview] = useState(currentImageUrl || null);
   const [dragActive, setDragActive] = useState(false);
+  const [loadFailed, setLoadFailed] = useState(false);
 
   const handleFile = (file) => {
     if (!file) return;
     onFileSelected(file);
+    setLoadFailed(false);
     setPreview(URL.createObjectURL(file));
   };
 
@@ -26,7 +28,19 @@ export default function ImageDropzone({ label, currentImageUrl, onFileSelected }
           handleFile(e.dataTransfer.files?.[0]);
         }}
       >
-        {preview && <img src={preview} alt="Preview" className="image-dropzone__preview" />}
+        {preview && !loadFailed && (
+          <img
+            src={preview}
+            alt="Preview"
+            className="image-dropzone__preview"
+            onError={() => setLoadFailed(true)}
+          />
+        )}
+        {preview && loadFailed && (
+          <p className="image-dropzone__error">
+            Image failed to load — the file may not be publicly accessible at its stored URL.
+          </p>
+        )}
         <p className="image-dropzone__hint">
           {preview ? 'Drop a new image or click to replace' : 'Drag & drop an image here, or click to browse'}
         </p>
