@@ -135,9 +135,18 @@ if USE_S3:
     AWS_ACCESS_KEY_ID = env('AWS_ACCESS_KEY_ID')
     AWS_SECRET_ACCESS_KEY = env('AWS_SECRET_ACCESS_KEY')
     AWS_STORAGE_BUCKET_NAME = env('AWS_STORAGE_BUCKET_NAME')
-    AWS_S3_ENDPOINT_URL = env('AWS_S3_ENDPOINT_URL')  # e.g. https://<account_id>.r2.cloudflarestorage.com
+    # Must be the account-level endpoint only — no bucket name in the host,
+    # e.g. https://<account_id>.r2.cloudflarestorage.com. With
+    # AWS_S3_ADDRESSING_STYLE = "virtual", django-storages prepends the
+    # bucket itself (<bucket>.<account_id>.r2.cloudflarestorage.com); if the
+    # env var already includes the bucket, the resulting host is broken.
+    AWS_S3_ENDPOINT_URL = env('AWS_S3_ENDPOINT_URL')
     AWS_S3_CUSTOM_DOMAIN = env('AWS_S3_CUSTOM_DOMAIN', default=None)  # e.g. media.blacknadya.com
     AWS_S3_ADDRESSING_STYLE = 'virtual'
+    # R2 doesn't use AWS regions, but boto3's SigV4 signing still requires a
+    # region string be present — Cloudflare's docs say to use "auto".
+    AWS_S3_REGION_NAME = env('AWS_S3_REGION_NAME', default='auto')
+    AWS_S3_SIGNATURE_VERSION = 's3v4'
     AWS_DEFAULT_ACL = None
     AWS_QUERYSTRING_AUTH = False
 else:
