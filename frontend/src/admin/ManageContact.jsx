@@ -18,6 +18,7 @@ const EMPTY_FORM = {
 
 export default function ManageContact() {
   const [form, setForm] = useState(EMPTY_FORM);
+  const [savedForm, setSavedForm] = useState(EMPTY_FORM);
   const [activeLang, setActiveLang] = useState('en');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -26,7 +27,7 @@ export default function ManageContact() {
     adminSiteSettings
       .get()
       .then((data) => {
-        setForm({
+        const loaded = {
           contact_phone: data.contact_phone || '',
           contact_email: data.contact_email || '',
           instagram: data.social_links?.instagram || '',
@@ -37,11 +38,15 @@ export default function ManageContact() {
           footer_text_en: data.footer_text_en || '',
           footer_text_mk: data.footer_text_mk || '',
           footer_text_sq: data.footer_text_sq || '',
-        });
+        };
+        setForm(loaded);
+        setSavedForm(loaded);
       })
       .catch(() => toast.error('Failed to load contact info.'))
       .finally(() => setLoading(false));
   }, []);
+
+  const isDirty = JSON.stringify(form) !== JSON.stringify(savedForm);
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -61,6 +66,7 @@ export default function ManageContact() {
     };
     try {
       await adminSiteSettings.update(payload);
+      setSavedForm(form);
       toast.success('Contact info updated.');
     } catch {
       toast.error('Could not save contact info.');
@@ -115,7 +121,7 @@ export default function ManageContact() {
           />
         </div>
 
-        <button type="submit" className="btn btn--gold" disabled={saving}>
+        <button type="submit" className="btn btn--gold" disabled={saving || !isDirty}>
           {saving ? 'Saving…' : 'Save Changes'}
         </button>
       </form>

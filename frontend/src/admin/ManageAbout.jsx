@@ -18,6 +18,7 @@ const QUILL_MODULES = {
 export default function ManageAbout() {
   const [settings, setSettings] = useState(null);
   const [text, setText] = useState({ en: '', mk: '', sq: '' });
+  const [savedText, setSavedText] = useState({ en: '', mk: '', sq: '' });
   const [activeLang, setActiveLang] = useState('en');
   const [imageFile, setImageFile] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -28,15 +29,19 @@ export default function ManageAbout() {
       .get()
       .then((data) => {
         setSettings(data);
-        setText({
+        const loadedText = {
           en: data.about_us_text_en || '',
           mk: data.about_us_text_mk || '',
           sq: data.about_us_text_sq || '',
-        });
+        };
+        setText(loadedText);
+        setSavedText(loadedText);
       })
       .catch(() => toast.error('Failed to load About Us content.'))
       .finally(() => setLoading(false));
   }, []);
+
+  const isDirty = JSON.stringify(text) !== JSON.stringify(savedText) || Boolean(imageFile);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -50,6 +55,8 @@ export default function ManageAbout() {
     try {
       const updated = await adminSiteSettings.update(payload);
       setSettings(updated);
+      setSavedText(text);
+      setImageFile(null);
       toast.success('About Us page updated.');
     } catch {
       toast.error('Could not save About Us content.');
@@ -80,13 +87,22 @@ export default function ManageAbout() {
               key={activeLang}
               theme="snow"
               value={text[activeLang]}
-              onChange={(value) => setText({ ...text, [activeLang]: value })}
+              onChange={(value, delta, source) => {
+                if (source === 'user') {
+                  setText((prev) => ({ ...prev, [activeLang]: value }));
+                } else {
+                  // Quill normalizes HTML (e.g. entities) on mount; sync both
+                  // sides so that normalization alone doesn't register as a change.
+                  setText((prev) => ({ ...prev, [activeLang]: value }));
+                  setSavedText((prev) => ({ ...prev, [activeLang]: value }));
+                }
+              }}
               modules={QUILL_MODULES}
             />
           </div>
         </div>
 
-        <button type="submit" className="btn btn--gold" style={{ marginTop: 12 }} disabled={saving}>
+        <button type="submit" className="btn btn--gold" style={{ marginTop: 12 }} disabled={saving || !isDirty}>
           {saving ? 'Saving…' : 'Save Changes'}
         </button>
       </form>

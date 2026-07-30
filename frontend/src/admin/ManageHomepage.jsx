@@ -7,6 +7,7 @@ import LangTabs from './components/LangTabs';
 export default function ManageHomepage() {
   const [settings, setSettings] = useState(null);
   const [tagline, setTagline] = useState({ en: '', mk: '', sq: '' });
+  const [savedTagline, setSavedTagline] = useState({ en: '', mk: '', sq: '' });
   const [activeLang, setActiveLang] = useState('en');
   const [backgroundFile, setBackgroundFile] = useState(null);
   const [logoFile, setLogoFile] = useState(null);
@@ -18,15 +19,20 @@ export default function ManageHomepage() {
       .get()
       .then((data) => {
         setSettings(data);
-        setTagline({
+        const loadedTagline = {
           en: data.hero_tagline_en || '',
           mk: data.hero_tagline_mk || '',
           sq: data.hero_tagline_sq || '',
-        });
+        };
+        setTagline(loadedTagline);
+        setSavedTagline(loadedTagline);
       })
       .catch(() => toast.error('Failed to load homepage settings.'))
       .finally(() => setLoading(false));
   }, []);
+
+  const isDirty =
+    JSON.stringify(tagline) !== JSON.stringify(savedTagline) || Boolean(backgroundFile) || Boolean(logoFile);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -41,6 +47,9 @@ export default function ManageHomepage() {
     try {
       const updated = await adminSiteSettings.update(payload);
       setSettings(updated);
+      setSavedTagline(tagline);
+      setBackgroundFile(null);
+      setLogoFile(null);
       toast.success('Homepage updated.');
     } catch {
       toast.error('Could not save homepage settings.');
@@ -78,7 +87,7 @@ export default function ManageHomepage() {
           />
         </div>
 
-        <button type="submit" className="btn btn--gold" disabled={saving}>
+        <button type="submit" className="btn btn--gold" disabled={saving || !isDirty}>
           {saving ? 'Saving…' : 'Save Changes'}
         </button>
       </form>
