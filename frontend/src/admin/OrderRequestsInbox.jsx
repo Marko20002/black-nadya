@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { adminOrderRequests } from '../api/resources';
 import ConfirmDialog from '../components/ConfirmDialog';
+import TextPreview from '../components/TextPreview';
 
 const STATUS_OPTIONS = [
   { value: 'new', label: 'New' },
@@ -79,7 +80,9 @@ export default function OrderRequestsInbox() {
                   <td>{request.name}</td>
                   <td>{request.phone}</td>
                   <td>{request.city}</td>
-                  <td>{request.products_wanted}</td>
+                  <td>
+                    <TextPreview text={request.products_wanted} title={`Products requested by ${request.name}`} />
+                  </td>
                   <td>
                     <select
                       className="status-select"

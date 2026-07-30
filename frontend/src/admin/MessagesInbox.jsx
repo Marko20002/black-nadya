@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { adminContactMessages } from '../api/resources';
 import ConfirmDialog from '../components/ConfirmDialog';
+import TextPreview from '../components/TextPreview';
 
 export default function MessagesInbox() {
   const [messages, setMessages] = useState([]);
@@ -71,7 +72,9 @@ export default function MessagesInbox() {
                 <tr key={message.id} style={{ fontWeight: message.is_read ? 400 : 700 }}>
                   <td>{message.name}</td>
                   <td>{message.email}</td>
-                  <td style={{ maxWidth: 320 }}>{message.message}</td>
+                  <td>
+                    <TextPreview text={message.message} title={`Message from ${message.name}`} />
+                  </td>
                   <td>{new Date(message.created_at).toLocaleDateString()}</td>
                   <td>
                     <input
