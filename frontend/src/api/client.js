@@ -5,17 +5,24 @@ export const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:80
 const SESSION_EXPIRES_KEY = 'bn_session_expires_at';
 
 // Auth tokens live in httpOnly cookies now — never read/written by JS.
-// withCredentials lets those cookies (and Django's CSRF cookie) travel on
-// cross-origin requests; withXSRFToken forces axios to echo the CSRF cookie
-// back as a header even cross-origin (its same-origin default would
-// otherwise skip that entirely, since frontend and backend are on different
-// hosts).
+// withCredentials lets those cookies travel on cross-origin requests.
+//
+// CSRF is NOT handled via axios's built-in xsrfCookieName/withXSRFToken
+// cookie-reading shortcut (the standard double-submit-cookie pattern) —
+// that only works when the frontend can read the CSRF cookie itself via
+// document.cookie, which requires a shared browser-visible cookie scope
+// (same site, or a shared parent domain with CSRF_COOKIE_DOMAIN set).
+// Here the frontend (blacknadya.com) and API (Railway's own domain, no
+// shared parent) don't share one: the browser still attaches the cookie
+// correctly to requests, but document.cookie on the frontend's origin can
+// never see a cookie that belongs to a different domain, so there's never
+// a value for axios to echo back as a header. Instead, ensureCsrfCookie()
+// below reads the token from the API response BODY (readable by JS
+// regardless of domain, since it's just the frontend's own script reading
+// its own response) and attaches it as a fixed default header.
 const sharedConfig = {
   baseURL: `${API_URL}/api`,
   withCredentials: true,
-  withXSRFToken: true,
-  xsrfCookieName: 'csrftoken',
-  xsrfHeaderName: 'X-CSRFToken',
 };
 
 export const publicApi = axios.create(sharedConfig);
@@ -61,7 +68,10 @@ adminApi.interceptors.response.use(
 );
 
 export async function ensureCsrfCookie() {
-  await publicApi.get('/auth/csrf/');
+  const { data } = await publicApi.get('/auth/csrf/');
+  if (data?.csrfToken) {
+    adminApi.defaults.headers.common['X-CSRFToken'] = data.csrfToken;
+  }
 }
 
 export async function login(username, password) {
@@ -87,12 +97,7 @@ export async function isAuthenticated() {
   // attempt, which also 401s, which redirects to the login page, which
   // re-mounts the app and repeats the exact same check forever.
   try {
-    await axios.get(`${API_URL}/api/auth/me/`, {
-      withCredentials: true,
-      withXSRFToken: true,
-      xsrfCookieName: 'csrftoken',
-      xsrfHeaderName: 'X-CSRFToken',
-    });
+    await axios.get(`${API_URL}/api/auth/me/`, { withCredentials: true });
     return true;
   } catch {
     return false;

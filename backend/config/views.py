@@ -1,8 +1,7 @@
 from datetime import datetime, timezone as dt_timezone
 
 from django.conf import settings
-from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import ensure_csrf_cookie
+from django.middleware.csrf import get_token
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -98,18 +97,27 @@ class LogoutView(APIView):
 
 class CsrfCookieView(APIView):
     """
-    GET this once on app load so Django sets its (non-httpOnly, by design)
-    csrftoken cookie before any state-changing admin request is made — axios
-    reads it and echoes it back as X-CSRFToken, the standard double-submit
-    pattern.
+    GET this once on app load. Returns the CSRF token in the response body
+    (not just as a cookie) so the frontend can attach it as a header
+    explicitly, rather than relying on axios reading the csrftoken cookie
+    via document.cookie.
+
+    That cookie-reading shortcut is the standard double-submit-cookie
+    pattern, but it only works when the frontend and API share a
+    browser-visible cookie scope (same site, or a shared parent domain with
+    CSRF_COOKIE_DOMAIN set). Here the frontend (blacknadya.com) and API
+    (Railway's own domain, no shared parent) don't, so a cookie the API sets
+    is invisible to document.cookie on the frontend's origin even though the
+    browser still attaches it correctly to requests — get_token() below both
+    ensures the cookie is set for the server-side comparison and gives us
+    the value to hand to JS directly, sidestepping that gap entirely.
     """
 
     permission_classes = [AllowAny]
     authentication_classes = []
 
-    @method_decorator(ensure_csrf_cookie)
     def get(self, request, *args, **kwargs):
-        return Response({'detail': 'CSRF cookie set.'})
+        return Response({'csrfToken': get_token(request)})
 
 
 @api_view(['GET'])

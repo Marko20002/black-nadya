@@ -218,15 +218,24 @@ AUTH_COOKIE_SAMESITE = 'None' if AUTH_COOKIE_SECURE else 'Lax'
 # Django's CSRF cookie needs the same Secure/SameSite treatment as the auth
 # cookies for the same cross-site reason — otherwise the browser won't
 # attach it to the cross-origin XHR/fetch calls the frontend makes, and
-# every state-changing admin request would fail CSRF validation. It stays
-# readable by JS (not httpOnly) on purpose: that's how axios reads it to
-# echo it back as X-CSRFToken (the standard double-submit-cookie pattern).
+# every state-changing admin request would fail CSRF validation.
+#
+# HTTPONLY IS TRUE: the frontend (blacknadya.com) and API (Railway's own
+# domain, no shared parent domain) don't share a browser-visible cookie
+# scope, so document.cookie on the frontend's origin can never read this
+# cookie regardless of the httpOnly flag — the classic axios
+# xsrfCookieName/withXSRFToken double-submit pattern silently cannot work
+# here. The frontend instead gets the token from the /api/auth/csrf/
+# response BODY (see CsrfCookieView) and attaches it as a fixed header
+# itself, so the cookie no longer needs JS access at all — making it
+# httpOnly is free extra hardening now, not a functional requirement.
+#
 # CSRF_TRUSTED_ORIGINS must list the frontend origin(s) too, since Django
 # checks the request's Origin header against this list for cross-origin
 # unsafe requests, independently of the token itself matching.
 CSRF_COOKIE_SECURE = AUTH_COOKIE_SECURE
 CSRF_COOKIE_SAMESITE = AUTH_COOKIE_SAMESITE
-CSRF_COOKIE_HTTPONLY = False
+CSRF_COOKIE_HTTPONLY = True
 CSRF_TRUSTED_ORIGINS = CORS_ALLOWED_ORIGINS
 
 # HTTPS is terminated by Railway's edge proxy in production; trust its
