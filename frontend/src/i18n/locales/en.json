@@ -107,11 +107,5 @@
     "decreaseQty": "Decrease quantity",
     "remove": "Remove",
     "proceedToOrder": "Proceed to Order"
-  },
-  "productChecklist": {
-    "title": "Select Products",
-    "empty": "No products available.",
-    "cancel": "Cancel",
-    "addSelected": "Add Selected"
   }
 }

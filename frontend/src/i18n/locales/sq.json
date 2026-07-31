@@ -107,11 +107,5 @@
     "decreaseQty": "Zvogëlo sasinë",
     "remove": "Hiq",
     "proceedToOrder": "Vazhdo te Porosia"
-  },
-  "productChecklist": {
-    "title": "Zgjidh Produktet",
-    "empty": "Nuk ka produkte të disponueshme.",
-    "cancel": "Anulo",
-    "addSelected": "Shto të Zgjedhurat"
   }
 }

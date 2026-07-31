@@ -6,11 +6,33 @@ import { getPharmacies, getProducts, submitOrderRequest } from '../api/resources
 import { pickTranslated } from '../i18n/pickTranslated';
 import { useCart } from '../hooks/useCart';
 import Loader from '../components/Loader';
-import ProductChecklistModal from '../components/ProductChecklistModal';
 import './WhereToBuy.css';
 
 function formatItemsSummary(items) {
   return items.map(({ name, qty }) => `${qty}x ${name}`).join(', ');
+}
+
+/**
+ * Keeps the auto-generated product summary inside a free-text field in sync
+ * with the structured cart state, without touching anything the person
+ * typed themselves. Replaces the exact substring inserted by the previous
+ * sync; if that substring was edited/removed by the person, falls back to
+ * appending fresh rather than guessing where it went.
+ */
+function syncAutoSummary(text, prevSummary, newSummary) {
+  if (prevSummary && text.includes(prevSummary)) {
+    if (newSummary) return text.replace(prevSummary, newSummary);
+    const leadingNewlineRemoved = text.replace(`\n${prevSummary}`, '');
+    if (leadingNewlineRemoved !== text) return leadingNewlineRemoved;
+    const trailingNewlineRemoved = text.replace(`${prevSummary}\n`, '');
+    if (trailingNewlineRemoved !== text) return trailingNewlineRemoved;
+    return text.replace(prevSummary, '');
+  }
+  if (newSummary) {
+    const trimmed = text.trim();
+    return trimmed ? `${trimmed}\n${newSummary}` : newSummary;
+  }
+  return text;
 }
 
 const EMPTY_FORM = {
@@ -34,8 +56,7 @@ export default function WhereToBuy() {
   const [errors, setErrors] = useState({});
   const [allProducts, setAllProducts] = useState([]);
   const [dropdownProductId, setDropdownProductId] = useState('');
-  const [checklistOpen, setChecklistOpen] = useState(false);
-  const cartSyncedRef = useRef(false);
+  const lastAutoSummaryRef = useRef('');
 
   useEffect(() => {
     getPharmacies()
@@ -50,26 +71,20 @@ export default function WhereToBuy() {
       .catch(() => setAllProducts([]));
   }, []);
 
-  // Cart items may already be populated when arriving here via "Proceed to
-  // Order" — fold them into the textarea once per page visit so the
-  // person's own edits afterward aren't clobbered by re-syncing on re-render.
+  // Keeps the textarea's auto-generated summary in step with the cart at all
+  // times — on mount (arriving via "Proceed to Order"), and on every add,
+  // remove, or quantity change to "From Your Cart" below.
   useEffect(() => {
-    if (cartSyncedRef.current || cart.items.length === 0) return;
-    cartSyncedRef.current = true;
-    const summary = formatItemsSummary(
+    const newSummary = formatItemsSummary(
       cart.items.map(({ product, qty }) => ({ name: pickTranslated(product, 'name', lang), qty }))
     );
-    appendToProductsWanted(summary);
+    const prevSummary = lastAutoSummaryRef.current;
+    if (newSummary !== prevSummary) {
+      setForm((f) => ({ ...f, products_wanted: syncAutoSummary(f.products_wanted, prevSummary, newSummary) }));
+      lastAutoSummaryRef.current = newSummary;
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const appendToProductsWanted = (summaryLine) => {
-    if (!summaryLine) return;
-    setForm((f) => {
-      const trimmed = f.products_wanted.trim();
-      return { ...f, products_wanted: trimmed ? `${trimmed}\n${summaryLine}` : summaryLine };
-    });
-  };
+  }, [cart.items]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -77,16 +92,9 @@ export default function WhereToBuy() {
 
   const handleDropdownAdd = () => {
     if (!dropdownProductId) return;
-    setChecklistOpen(true);
-  };
-
-  const handleChecklistConfirm = (selectedProducts) => {
-    selectedProducts.forEach((product) => cart.add(product, 1));
-    const summary = formatItemsSummary(
-      selectedProducts.map((product) => ({ name: pickTranslated(product, 'name', lang), qty: 1 }))
-    );
-    appendToProductsWanted(summary);
-    setChecklistOpen(false);
+    const product = allProducts.find((p) => p.id === Number(dropdownProductId));
+    if (!product) return;
+    cart.add(product, 1);
     setDropdownProductId('');
   };
 
@@ -109,7 +117,6 @@ export default function WhereToBuy() {
       setForm(EMPTY_FORM);
       setErrors({});
       cart.clear();
-      cartSyncedRef.current = false;
     } catch (err) {
       const message =
         err?.response?.status === 429 ? t('whereToBuy.tooManyRequestsToast') : t('whereToBuy.errorToast');
@@ -267,14 +274,6 @@ export default function WhereToBuy() {
           </div>
         </div>
       </div>
-
-      <ProductChecklistModal
-        open={checklistOpen}
-        products={allProducts}
-        initialSelectedId={dropdownProductId ? Number(dropdownProductId) : null}
-        onConfirm={handleChecklistConfirm}
-        onClose={() => setChecklistOpen(false)}
-      />
     </div>
   );
 }
