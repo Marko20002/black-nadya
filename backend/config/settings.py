@@ -232,3 +232,31 @@ CSRF_TRUSTED_ORIGINS = CORS_ALLOWED_ORIGINS
 # HTTPS is terminated by Railway's edge proxy in production; trust its
 # forwarded-proto header so Django knows the original request was secure.
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# Django's default logging config gates its django.security.csrf /
+# django.request handlers behind a require_debug_true filter, so with
+# DEBUG=False (correct for production) those warnings never reach the
+# console — meaning CSRF/4xx failures were invisible in Railway's Deploy
+# Logs. This explicitly routes them to the console with no debug-only
+# filter, at any DEBUG setting.
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django.security.csrf': {
+            'handlers': ['console'],
+            'level': 'WARNING',
+            'propagate': False,
+        },
+        'django.request': {
+            'handlers': ['console'],
+            'level': 'WARNING',
+            'propagate': False,
+        },
+    },
+}

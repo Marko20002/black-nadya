@@ -1,8 +1,12 @@
+import logging
+
 from rest_framework.authentication import CSRFCheck
 from rest_framework.exceptions import PermissionDenied
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from .auth_cookies import ACCESS_COOKIE_NAME
+
+logger = logging.getLogger('django.security.csrf')
 
 
 class CookieJWTAuthentication(JWTAuthentication):
@@ -50,4 +54,13 @@ class CookieJWTAuthentication(JWTAuthentication):
         check.process_request(request)
         reason = check.process_view(request, None, (), {})
         if reason:
+            # DRF's CSRFCheck overrides _reject() to return the reason string
+            # instead of an HttpResponse, which means it never calls Django's
+            # own log_response()/django.security.csrf logging — so without
+            # this, CSRF failures on this path were invisible in Railway's
+            # logs even with DEBUG=False's console-logging gate removed.
+            logger.warning(
+                'CSRF check failed for %s %s (content-type=%s): %s',
+                request.method, request.path, request.content_type, reason,
+            )
             raise PermissionDenied(f'CSRF Failed: {reason}')
