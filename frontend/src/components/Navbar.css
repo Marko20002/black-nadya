@@ -53,6 +53,44 @@
   border-bottom-color: var(--color-gold);
 }
 
+.navbar__actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.navbar__cart-btn {
+  position: relative;
+  background: none;
+  border: none;
+  color: var(--color-offwhite);
+  display: flex;
+  align-items: center;
+  transition: color var(--transition);
+}
+
+.navbar__cart-btn:hover {
+  color: var(--color-gold);
+}
+
+.navbar__cart-badge {
+  position: absolute;
+  top: -8px;
+  right: -10px;
+  background: var(--color-gold);
+  color: var(--color-black);
+  font-size: 0.65rem;
+  font-weight: 700;
+  line-height: 1;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+}
+
 @media (max-width: 720px) {
   .navbar__inner {
     flex-direction: column;

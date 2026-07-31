@@ -69,3 +69,10 @@
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
+
+.product-card__add-btn {
+  margin-top: 10px;
+  padding: 9px 16px;
+  font-size: 0.75rem;
+  align-self: flex-start;
+}

@@ -54,6 +54,9 @@
     "city": "City",
     "address": "Address",
     "productsWanted": "Product(s) Wanted",
+    "cartItemsLabel": "From Your Cart",
+    "pickProduct": "Choose a product…",
+    "addProduct": "Add",
     "notesOptional": "Notes (optional)",
     "submit": "Submit Order Request",
     "submitting": "Sending…",
@@ -93,5 +96,22 @@
   },
   "footer": {
     "tagline": "Natural Cosmetics"
+  },
+  "cart": {
+    "title": "Your Cart",
+    "close": "Close cart",
+    "empty": "Your cart is empty.",
+    "addToCart": "Add to Cart",
+    "addedToast": "Added to cart",
+    "increaseQty": "Increase quantity",
+    "decreaseQty": "Decrease quantity",
+    "remove": "Remove",
+    "proceedToOrder": "Proceed to Order"
+  },
+  "productChecklist": {
+    "title": "Select Products",
+    "empty": "No products available.",
+    "cancel": "Cancel",
+    "addSelected": "Add Selected"
   }
 }

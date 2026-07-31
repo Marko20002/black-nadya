@@ -1,11 +1,14 @@
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import toast from 'react-hot-toast';
 import { pickTranslated } from '../i18n/pickTranslated';
 import { categoryLabel } from '../i18n/categoryLabel';
+import { useCart } from '../hooks/useCart';
 import './ProductCard.css';
 
 export default function ProductCard({ product }) {
   const { t, i18n } = useTranslation();
+  const cart = useCart();
   const lang = i18n.language?.split('-')[0] || 'en';
 
   const name = pickTranslated(product, 'name', lang);
@@ -17,6 +20,13 @@ export default function ProductCard({ product }) {
     .map((tag) => tag.trim())
     .filter(Boolean)
     .slice(0, 3);
+
+  const handleAddToCart = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    cart.add(product, 1);
+    toast.success(t('cart.addedToast'));
+  };
 
   return (
     <Link to={`/products/${product.slug}`} className="product-card">
@@ -40,6 +50,9 @@ export default function ProductCard({ product }) {
             ))}
           </div>
         )}
+        <button type="button" className="btn btn--outline-dark product-card__add-btn" onClick={handleAddToCart}>
+          {t('cart.addToCart')}
+        </button>
       </div>
     </Link>
   );

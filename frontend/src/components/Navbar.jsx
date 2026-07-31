@@ -1,7 +1,11 @@
+import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { ShoppingBag } from 'lucide-react';
 import { useSiteSettings } from '../hooks/useSiteSettings';
+import { useCart } from '../hooks/useCart';
 import LanguageSwitcher from './LanguageSwitcher';
+import CartDrawer from './CartDrawer';
 import './Navbar.css';
 
 const LINKS = [
@@ -15,6 +19,8 @@ const LINKS = [
 export default function Navbar() {
   const { settings } = useSiteSettings();
   const { t } = useTranslation();
+  const cart = useCart();
+  const [cartOpen, setCartOpen] = useState(false);
 
   return (
     <header className="navbar">
@@ -38,8 +44,20 @@ export default function Navbar() {
             </NavLink>
           ))}
         </nav>
-        <LanguageSwitcher />
+        <div className="navbar__actions">
+          <button
+            type="button"
+            className="navbar__cart-btn"
+            onClick={() => setCartOpen(true)}
+            aria-label={t('cart.title')}
+          >
+            <ShoppingBag size={22} />
+            {cart.itemCount > 0 && <span className="navbar__cart-badge">{cart.itemCount}</span>}
+          </button>
+          <LanguageSwitcher />
+        </div>
       </div>
+      <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
     </header>
   );
 }

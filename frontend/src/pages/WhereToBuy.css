@@ -47,6 +47,96 @@
   font-size: 0.85rem;
 }
 
+.where-to-buy__cart-list {
+  margin-bottom: 18px;
+}
+
+.where-to-buy__cart-list-label {
+  display: block;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted);
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.where-to-buy__cart-list ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.where-to-buy__cart-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+}
+
+.where-to-buy__cart-row-name {
+  font-size: 0.9rem;
+}
+
+.where-to-buy__cart-row-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.where-to-buy__cart-stepper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 3px 8px;
+}
+
+.where-to-buy__cart-stepper button {
+  background: none;
+  border: none;
+  display: flex;
+  color: var(--color-black);
+}
+
+.where-to-buy__cart-stepper span {
+  min-width: 1em;
+  text-align: center;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.where-to-buy__cart-row-remove {
+  background: none;
+  border: none;
+  color: #b3402a;
+  display: flex;
+}
+
+.where-to-buy__product-picker {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.where-to-buy__product-picker select {
+  flex: 1;
+  padding: 11px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  background: var(--color-white);
+  color: var(--color-text-dark);
+}
+
 @media (max-width: 900px) {
   .where-to-buy {
     grid-template-columns: 1fr;

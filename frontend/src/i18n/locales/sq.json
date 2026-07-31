@@ -54,6 +54,9 @@
     "city": "Qyteti",
     "address": "Adresa",
     "productsWanted": "Produkti/et e Dëshiruar",
+    "cartItemsLabel": "Nga Shporta Juaj",
+    "pickProduct": "Zgjidh një produkt…",
+    "addProduct": "Shto",
     "notesOptional": "Shënime (opsionale)",
     "submit": "Dërgo Kërkesën për Porosi",
     "submitting": "Duke dërguar…",
@@ -93,5 +96,22 @@
   },
   "footer": {
     "tagline": "Kozmetikë Natyrale"
+  },
+  "cart": {
+    "title": "Shporta Juaj",
+    "close": "Mbyll shportën",
+    "empty": "Shporta juaj është bosh.",
+    "addToCart": "Shto në Shportë",
+    "addedToast": "U shtua në shportë",
+    "increaseQty": "Rrit sasinë",
+    "decreaseQty": "Zvogëlo sasinë",
+    "remove": "Hiq",
+    "proceedToOrder": "Vazhdo te Porosia"
+  },
+  "productChecklist": {
+    "title": "Zgjidh Produktet",
+    "empty": "Nuk ka produkte të disponueshme.",
+    "cancel": "Anulo",
+    "addSelected": "Shto të Zgjedhurat"
   }
 }

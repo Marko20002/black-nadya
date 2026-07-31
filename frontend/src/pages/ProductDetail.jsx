@@ -1,24 +1,29 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import toast from 'react-hot-toast';
 import { getProduct } from '../api/resources';
 import { pickTranslated } from '../i18n/pickTranslated';
 import { categoryLabel } from '../i18n/categoryLabel';
+import { useCart } from '../hooks/useCart';
 import Loader from '../components/Loader';
 import './ProductDetail.css';
 
 export default function ProductDetail() {
   const { slug } = useParams();
   const { t, i18n } = useTranslation();
+  const cart = useCart();
   const lang = i18n.language?.split('-')[0] || 'en';
   const [product, setProduct] = useState(null);
   const [activeImage, setActiveImage] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [quantity, setQuantity] = useState(1);
 
   useEffect(() => {
     setLoading(true);
     setError(false);
+    setQuantity(1);
     getProduct(slug)
       .then((data) => {
         setProduct(data);
@@ -50,6 +55,12 @@ export default function ProductDetail() {
     .filter(Boolean);
 
   const gallery = [product.image, ...product.gallery_images.map((g) => g.image)].filter(Boolean);
+
+  const handleAddToCart = () => {
+    cart.add(product, quantity);
+    toast.success(t('cart.addedToast'));
+    setQuantity(1);
+  };
 
   return (
     <div className="section">
@@ -93,7 +104,30 @@ export default function ProductDetail() {
             </>
           )}
 
-          <Link to="/where-to-buy" className="btn btn--gold product-detail__cta">
+          <div className="product-detail__cart-row">
+            <div className="product-detail__stepper">
+              <button
+                type="button"
+                onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                aria-label={t('cart.decreaseQty')}
+              >
+                −
+              </button>
+              <span>{quantity}</span>
+              <button
+                type="button"
+                onClick={() => setQuantity((q) => q + 1)}
+                aria-label={t('cart.increaseQty')}
+              >
+                +
+              </button>
+            </div>
+            <button type="button" className="btn btn--gold" onClick={handleAddToCart}>
+              {t('cart.addToCart')}
+            </button>
+          </div>
+
+          <Link to="/where-to-buy" className="btn btn--outline-dark product-detail__cta">
             {t('productDetail.whereToBuyThis')}
           </Link>
         </div>

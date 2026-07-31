@@ -1,10 +1,17 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { getPharmacies, submitOrderRequest } from '../api/resources';
+import { Minus, Plus, Trash2 } from 'lucide-react';
+import { getPharmacies, getProducts, submitOrderRequest } from '../api/resources';
 import { pickTranslated } from '../i18n/pickTranslated';
+import { useCart } from '../hooks/useCart';
 import Loader from '../components/Loader';
+import ProductChecklistModal from '../components/ProductChecklistModal';
 import './WhereToBuy.css';
+
+function formatItemsSummary(items) {
+  return items.map(({ name, qty }) => `${qty}x ${name}`).join(', ');
+}
 
 const EMPTY_FORM = {
   name: '',
@@ -19,11 +26,16 @@ const EMPTY_FORM = {
 export default function WhereToBuy() {
   const { t, i18n } = useTranslation();
   const lang = i18n.language?.split('-')[0] || 'en';
+  const cart = useCart();
   const [pharmacies, setPharmacies] = useState([]);
   const [loadingPharmacies, setLoadingPharmacies] = useState(true);
   const [form, setForm] = useState(EMPTY_FORM);
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState({});
+  const [allProducts, setAllProducts] = useState([]);
+  const [dropdownProductId, setDropdownProductId] = useState('');
+  const [checklistOpen, setChecklistOpen] = useState(false);
+  const cartSyncedRef = useRef(false);
 
   useEffect(() => {
     getPharmacies()
@@ -32,8 +44,50 @@ export default function WhereToBuy() {
       .finally(() => setLoadingPharmacies(false));
   }, []);
 
+  useEffect(() => {
+    getProducts()
+      .then(setAllProducts)
+      .catch(() => setAllProducts([]));
+  }, []);
+
+  // Cart items may already be populated when arriving here via "Proceed to
+  // Order" — fold them into the textarea once per page visit so the
+  // person's own edits afterward aren't clobbered by re-syncing on re-render.
+  useEffect(() => {
+    if (cartSyncedRef.current || cart.items.length === 0) return;
+    cartSyncedRef.current = true;
+    const summary = formatItemsSummary(
+      cart.items.map(({ product, qty }) => ({ name: pickTranslated(product, 'name', lang), qty }))
+    );
+    appendToProductsWanted(summary);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const appendToProductsWanted = (summaryLine) => {
+    if (!summaryLine) return;
+    setForm((f) => {
+      const trimmed = f.products_wanted.trim();
+      return { ...f, products_wanted: trimmed ? `${trimmed}\n${summaryLine}` : summaryLine };
+    });
+  };
+
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleDropdownAdd = () => {
+    if (!dropdownProductId) return;
+    setChecklistOpen(true);
+  };
+
+  const handleChecklistConfirm = (selectedProducts) => {
+    selectedProducts.forEach((product) => cart.add(product, 1));
+    const summary = formatItemsSummary(
+      selectedProducts.map((product) => ({ name: pickTranslated(product, 'name', lang), qty: 1 }))
+    );
+    appendToProductsWanted(summary);
+    setChecklistOpen(false);
+    setDropdownProductId('');
   };
 
   const validate = () => {
@@ -54,6 +108,8 @@ export default function WhereToBuy() {
       toast.success(t('whereToBuy.successToast'));
       setForm(EMPTY_FORM);
       setErrors({});
+      cart.clear();
+      cartSyncedRef.current = false;
     } catch (err) {
       const message =
         err?.response?.status === 429 ? t('whereToBuy.tooManyRequestsToast') : t('whereToBuy.errorToast');
@@ -97,6 +153,71 @@ export default function WhereToBuy() {
                 <label htmlFor="address">{t('whereToBuy.address')}</label>
                 <input id="address" name="address" value={form.address} onChange={handleChange} />
               </div>
+              {cart.items.length > 0 && (
+                <div className="where-to-buy__cart-list">
+                  <span className="where-to-buy__cart-list-label">{t('whereToBuy.cartItemsLabel')}</span>
+                  <ul>
+                    {cart.items.map(({ product, qty }) => (
+                      <li key={product.id} className="where-to-buy__cart-row">
+                        <span className="where-to-buy__cart-row-name">
+                          {pickTranslated(product, 'name', lang)}
+                        </span>
+                        <div className="where-to-buy__cart-row-controls">
+                          <div className="where-to-buy__cart-stepper">
+                            <button
+                              type="button"
+                              onClick={() => cart.updateQuantity(product.id, qty - 1)}
+                              aria-label={t('cart.decreaseQty')}
+                            >
+                              <Minus size={13} />
+                            </button>
+                            <span>{qty}</span>
+                            <button
+                              type="button"
+                              onClick={() => cart.updateQuantity(product.id, qty + 1)}
+                              aria-label={t('cart.increaseQty')}
+                            >
+                              <Plus size={13} />
+                            </button>
+                          </div>
+                          <button
+                            type="button"
+                            className="where-to-buy__cart-row-remove"
+                            onClick={() => cart.removeItem(product.id)}
+                            aria-label={t('cart.remove')}
+                          >
+                            <Trash2 size={15} />
+                          </button>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              <div className="where-to-buy__product-picker">
+                <select
+                  value={dropdownProductId}
+                  onChange={(e) => setDropdownProductId(e.target.value)}
+                  aria-label={t('whereToBuy.pickProduct')}
+                >
+                  <option value="">{t('whereToBuy.pickProduct')}</option>
+                  {allProducts.map((product) => (
+                    <option key={product.id} value={product.id}>
+                      {pickTranslated(product, 'name', lang)}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  type="button"
+                  className="btn btn--outline-dark"
+                  disabled={!dropdownProductId}
+                  onClick={handleDropdownAdd}
+                >
+                  {t('whereToBuy.addProduct')}
+                </button>
+              </div>
+
               <div className="form-field">
                 <label htmlFor="products_wanted">{t('whereToBuy.productsWanted')}</label>
                 <textarea
@@ -146,6 +267,14 @@ export default function WhereToBuy() {
           </div>
         </div>
       </div>
+
+      <ProductChecklistModal
+        open={checklistOpen}
+        products={allProducts}
+        initialSelectedId={dropdownProductId ? Number(dropdownProductId) : null}
+        onConfirm={handleChecklistConfirm}
+        onClose={() => setChecklistOpen(false)}
+      />
     </div>
   );
 }
