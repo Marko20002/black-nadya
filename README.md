@@ -35,6 +35,7 @@ black-nadya/
 
 ```bash
 cd backend
+cp .env.example .env             # local dev needs DJANGO_DEBUG=True + DJANGO_ALLOWED_HOSTS set
 python3 -m venv venv
 source venv/bin/activate        # Windows: venv\Scripts\activate
 pip install -r requirements.txt
@@ -43,6 +44,11 @@ python manage.py createsuperuser
 python manage.py seed_data       # optional: demo products/pharmacies/site content
 python manage.py runserver
 ```
+
+`DJANGO_DEBUG` and `DJANGO_ALLOWED_HOSTS` default to production-safe values in
+code (`DEBUG=False`, only the Railway host allowed) so a missing env var in
+production fails safe instead of leaking debug info. The `.env` file above
+overrides both for local dev.
 
 The API runs at `http://localhost:8000`. Django's own admin (technical
 fallback) is at `http://localhost:8000/admin/`.

@@ -10,7 +10,7 @@ import environ
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 env = environ.Env(
-    DJANGO_DEBUG=(bool, True),
+    DJANGO_DEBUG=(bool, False),
 )
 environ.Env.read_env(BASE_DIR / '.env')
 
@@ -21,7 +21,14 @@ SECRET_KEY = env(
 
 DEBUG = env('DJANGO_DEBUG')
 
-ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=['*'])
+# Fails safe if DJANGO_ALLOWED_HOSTS is ever missing in production: only the
+# known Railway host is allowed rather than '*'. Local dev sets both
+# DJANGO_DEBUG=True and DJANGO_ALLOWED_HOSTS via backend/.env (see
+# backend/.env.example).
+ALLOWED_HOSTS = env.list(
+    'DJANGO_ALLOWED_HOSTS',
+    default=['black-nadya-production.up.railway.app'],
+)
 
 
 INSTALLED_APPS = [
