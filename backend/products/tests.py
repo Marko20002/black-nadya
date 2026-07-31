@@ -46,8 +46,11 @@ class ProductAdminApiTests(APITestCase):
             '/api/auth/token/', {'username': 'owner', 'password': 'testpass123'}, format='json',
         )
         self.assertEqual(token_response.status_code, 200)
-        access = token_response.data['access']
-        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {access}')
+        self.assertNotIn('access', token_response.data)
+        self.assertIn('session_expires_at', token_response.data)
+        # Tokens are set as httpOnly cookies now, not returned in the body —
+        # the test client carries cookies across requests like a browser, so
+        # no manual credentials() attachment is needed.
         response = self.client.post('/api/admin/products/', {'name_en': 'New Product'}, format='json')
         self.assertEqual(response.status_code, 201)
         self.assertTrue(Product.objects.filter(name_en='New Product').exists())

@@ -3,7 +3,6 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from inquiries.views import (
     ContactMessageAdminViewSet,
@@ -21,7 +20,13 @@ from products.views import (
 )
 from sitecontent.views import SiteSettingsAdminView, SiteSettingsPublicView
 
-from .views import current_user
+from .views import (
+    CookieTokenObtainPairView,
+    CookieTokenRefreshView,
+    CsrfCookieView,
+    LogoutView,
+    current_user,
+)
 
 public_router = DefaultRouter()
 public_router.register('products', ProductViewSet, basename='product')
@@ -44,8 +49,10 @@ urlpatterns = [
     path('api/site-settings/', SiteSettingsPublicView.as_view(), name='site-settings'),
     path('api/', include(public_router.urls)),
 
-    path('api/auth/token/', TokenObtainPairView.as_view(), name='token-obtain-pair'),
-    path('api/auth/token/refresh/', TokenRefreshView.as_view(), name='token-refresh'),
+    path('api/auth/token/', CookieTokenObtainPairView.as_view(), name='token-obtain-pair'),
+    path('api/auth/token/refresh/', CookieTokenRefreshView.as_view(), name='token-refresh'),
+    path('api/auth/logout/', LogoutView.as_view(), name='auth-logout'),
+    path('api/auth/csrf/', CsrfCookieView.as_view(), name='auth-csrf'),
     path('api/auth/me/', current_user, name='current-user'),
 
     path('api/admin/site-settings/', SiteSettingsAdminView.as_view(), name='admin-site-settings'),

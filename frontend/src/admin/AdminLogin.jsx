@@ -2,16 +2,21 @@ import { useState } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useAuth } from '../hooks/useAuth';
+import Loader from '../components/Loader';
 import './AdminLogin.css';
 
 export default function AdminLogin() {
-  const { authenticated, login } = useAuth();
+  const { authenticated, checkingAuth, login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
+
+  if (checkingAuth) {
+    return <Loader label="Checking session…" />;
+  }
 
   if (authenticated) {
     return <Navigate to={location.state?.from || '/admin-panel'} replace />;

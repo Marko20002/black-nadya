@@ -164,7 +164,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'config.authentication.CookieJWTAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.AllowAny',
@@ -179,16 +179,49 @@ REST_FRAMEWORK = {
     },
 }
 
+# Access tokens are short-lived and silently refreshed via the httpOnly
+# bn_refresh cookie. ROTATE_REFRESH_TOKENS stays False on purpose: the
+# refresh token keeps its original 24h expiry from login instead of sliding
+# forward on every use, giving admin sessions a real 24h hard cutoff rather
+# than one that can be kept alive indefinitely by staying active.
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(hours=8),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
-    'ROTATE_REFRESH_TOKENS': True,
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),
+    'REFRESH_TOKEN_LIFETIME': timedelta(hours=24),
+    'ROTATE_REFRESH_TOKENS': False,
 }
 
 CORS_ALLOWED_ORIGINS = env.list(
     'DJANGO_CORS_ALLOWED_ORIGINS',
     default=['http://localhost:5173', 'http://127.0.0.1:5173'],
 )
+# Cookie-based auth requires the browser to send/receive cookies on
+# cross-origin requests (frontend on Vercel, backend on Railway) — both this
+# and the cookies' SameSite=None depend on CORS_ALLOWED_ORIGINS never being
+# '*', since credentialed CORS responses can't use a wildcard origin.
+CORS_ALLOW_CREDENTIALS = True
+
+# Auth cookies need SameSite=None (cross-site: Vercel frontend, Railway
+# backend) in production, but SameSite=None is only honored by browsers when
+# the cookie is also Secure — which requires actual HTTPS. Local dev runs
+# over plain http://localhost, so it falls back to SameSite=Lax/non-Secure
+# (same-site enough for localhost:5173 -> localhost:8000) or the cookies
+# would silently never be set at all during local testing.
+AUTH_COOKIE_SECURE = not DEBUG
+AUTH_COOKIE_SAMESITE = 'None' if AUTH_COOKIE_SECURE else 'Lax'
+
+# Django's CSRF cookie needs the same Secure/SameSite treatment as the auth
+# cookies for the same cross-site reason — otherwise the browser won't
+# attach it to the cross-origin XHR/fetch calls the frontend makes, and
+# every state-changing admin request would fail CSRF validation. It stays
+# readable by JS (not httpOnly) on purpose: that's how axios reads it to
+# echo it back as X-CSRFToken (the standard double-submit-cookie pattern).
+# CSRF_TRUSTED_ORIGINS must list the frontend origin(s) too, since Django
+# checks the request's Origin header against this list for cross-origin
+# unsafe requests, independently of the token itself matching.
+CSRF_COOKIE_SECURE = AUTH_COOKIE_SECURE
+CSRF_COOKIE_SAMESITE = AUTH_COOKIE_SAMESITE
+CSRF_COOKIE_HTTPONLY = False
+CSRF_TRUSTED_ORIGINS = CORS_ALLOWED_ORIGINS
 
 # HTTPS is terminated by Railway's edge proxy in production; trust its
 # forwarded-proto header so Django knows the original request was secure.
