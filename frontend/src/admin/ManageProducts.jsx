@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { adminCategories, adminProducts } from '../api/resources';
 import ConfirmDialog from '../components/ConfirmDialog';
@@ -28,8 +29,6 @@ export default function ManageProducts() {
   const [activeLang, setActiveLang] = useState('en');
   const [imageFile, setImageFile] = useState(null);
   const [saving, setSaving] = useState(false);
-  const [newCategoryName, setNewCategoryName] = useState('');
-  const [addingCategory, setAddingCategory] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
 
   const loadAll = () => {
@@ -72,22 +71,6 @@ export default function ManageProducts() {
   const handleChange = (e) => {
     const { name, type, checked, value } = e.target;
     setForm({ ...form, [name]: type === 'checkbox' ? checked : value });
-  };
-
-  const handleAddCategory = async () => {
-    if (!newCategoryName.trim()) return;
-    setAddingCategory(true);
-    try {
-      const category = await adminCategories.create({ name: newCategoryName.trim() });
-      setCategories([...categories, category]);
-      setForm((f) => ({ ...f, category: category.id }));
-      setNewCategoryName('');
-      toast.success('Category added.');
-    } catch {
-      toast.error('Could not add category.');
-    } finally {
-      setAddingCategory(false);
-    }
   };
 
   const handleSubmit = async (e) => {
@@ -203,25 +186,13 @@ export default function ManageProducts() {
                   <option value="">— Select category —</option>
                   {categories.map((cat) => (
                     <option key={cat.id} value={cat.id}>
-                      {cat.name}
+                      {cat.name_en}
                     </option>
                   ))}
                 </select>
-                <div className="admin-inline-add">
-                  <input
-                    placeholder="+ new category name"
-                    value={newCategoryName}
-                    onChange={(e) => setNewCategoryName(e.target.value)}
-                  />
-                  <button
-                    type="button"
-                    className="btn btn--outline-dark"
-                    onClick={handleAddCategory}
-                    disabled={addingCategory}
-                  >
-                    Add
-                  </button>
-                </div>
+                <Link to="/admin-panel/categories" className="admin-inline-link">
+                  Manage Categories →
+                </Link>
               </div>
 
               <div className="form-field">

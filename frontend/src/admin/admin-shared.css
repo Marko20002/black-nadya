@@ -258,6 +258,17 @@
   flex: 1;
 }
 
+.admin-inline-link {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 0.82rem;
+  color: var(--color-gold);
+}
+
+.admin-inline-link:hover {
+  text-decoration: underline;
+}
+
 .wysiwyg-wrap .ql-container {
   min-height: 220px;
   font-family: var(--font-sans);

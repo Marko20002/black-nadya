@@ -5,6 +5,7 @@ import './AdminLayout.css';
 const NAV = [
   { to: '/admin-panel', label: 'Dashboard', end: true },
   { to: '/admin-panel/products', label: 'Products' },
+  { to: '/admin-panel/categories', label: 'Categories' },
   { to: '/admin-panel/pharmacies', label: 'Pharmacies' },
   { to: '/admin-panel/homepage', label: 'Manage Homepage' },
   { to: '/admin-panel/about', label: 'Manage About Us' },

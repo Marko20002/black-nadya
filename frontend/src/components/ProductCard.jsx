@@ -38,7 +38,7 @@ export default function ProductCard({ product }) {
         )}
       </div>
       <div className="product-card__body">
-        {product.category && <span className="eyebrow">{categoryLabel(product.category, t)}</span>}
+        {product.category && <span className="eyebrow">{categoryLabel(product.category, lang)}</span>}
         <h3 className="product-card__name">{name}</h3>
         <p className="product-card__desc">{shortDescription}</p>
         {tags.length > 0 && (

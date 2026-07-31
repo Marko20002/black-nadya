@@ -86,7 +86,7 @@ export default function ProductDetail() {
         </div>
 
         <div className="product-detail__info">
-          {product.category && <span className="eyebrow">{categoryLabel(product.category, t)}</span>}
+          {product.category && <span className="eyebrow">{categoryLabel(product.category, lang)}</span>}
           <h1>{name}</h1>
           {product.size && <p className="product-detail__size">{product.size}</p>}
           <p className="product-detail__desc">{description}</p>

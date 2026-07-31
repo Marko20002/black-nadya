@@ -1,12 +1,7 @@
-const KEY_BY_SLUG = {
-  serums: 'products.categorySerums',
-  creams: 'products.categoryCreams',
-  oils: 'products.categoryOils',
-};
+import { pickTranslated } from './pickTranslated';
 
-/** Translates the fixed seed categories; falls back to the raw name for any custom category an owner adds later. */
-export function categoryLabel(category, t) {
+/** Reads a category's translated name for the active language, falling back to English. */
+export function categoryLabel(category, lang) {
   if (!category) return '';
-  const key = KEY_BY_SLUG[category.slug];
-  return key ? t(key) : category.name;
+  return pickTranslated(category, 'name', lang);
 }

@@ -17,6 +17,7 @@ import AdminLayout from './admin/AdminLayout';
 import ProtectedRoute from './admin/ProtectedRoute';
 import Dashboard from './admin/Dashboard';
 import ManageProducts from './admin/ManageProducts';
+import ManageCategories from './admin/ManageCategories';
 import ManagePharmacies from './admin/ManagePharmacies';
 import ManageHomepage from './admin/ManageHomepage';
 import ManageAbout from './admin/ManageAbout';
@@ -46,6 +47,7 @@ export default function App() {
                 <Route path="/admin-panel" element={<AdminLayout />}>
                   <Route index element={<Dashboard />} />
                   <Route path="products" element={<ManageProducts />} />
+                  <Route path="categories" element={<ManageCategories />} />
                   <Route path="pharmacies" element={<ManagePharmacies />} />
                   <Route path="homepage" element={<ManageHomepage />} />
                   <Route path="about" element={<ManageAbout />} />

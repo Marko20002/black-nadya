@@ -8,7 +8,8 @@ import Loader from '../components/Loader';
 import './Products.css';
 
 export default function Products() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const lang = i18n.language?.split('-')[0] || 'en';
   const [searchParams, setSearchParams] = useSearchParams();
   const activeCategory = searchParams.get('category') || '';
   const [categories, setCategories] = useState([]);
@@ -57,7 +58,7 @@ export default function Products() {
               className={`category-filter__pill${activeCategory === cat.slug ? ' category-filter__pill--active' : ''}`}
               onClick={() => selectCategory(cat.slug)}
             >
-              {categoryLabel(cat, t)}
+              {categoryLabel(cat, lang)}
             </button>
           ))}
         </div>

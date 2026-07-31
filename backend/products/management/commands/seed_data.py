@@ -320,9 +320,17 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS('Seed data created successfully.'))
 
     def seed_categories_and_products(self):
+        category_translations = {
+            'Serums': {'en': 'Serums', 'mk': 'Серуми', 'sq': 'Serume'},
+            'Creams': {'en': 'Creams', 'mk': 'Кремови', 'sq': 'Kremra'},
+            'Oils': {'en': 'Oils', 'mk': 'Масла', 'sq': 'Vajra'},
+        }
         categories = {}
-        for name in ['Serums', 'Creams', 'Oils']:
-            category, _ = Category.objects.get_or_create(name=name)
+        for name, translations in category_translations.items():
+            category, _ = Category.objects.get_or_create(
+                name_en=translations['en'],
+                defaults={'name_mk': translations['mk'], 'name_sq': translations['sq']},
+            )
             categories[name] = category
 
         for data in PRODUCTS:

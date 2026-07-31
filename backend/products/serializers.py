@@ -11,9 +11,17 @@ TRANSLATED_FIELDS = [
 
 
 class CategorySerializer(serializers.ModelSerializer):
+    product_count = serializers.IntegerField(source='products.count', read_only=True)
+
     class Meta:
         model = Category
-        fields = ['id', 'name', 'slug']
+        fields = ['id', 'name', 'name_en', 'name_mk', 'name_sq', 'slug', 'product_count']
+        read_only_fields = ['name']
+
+    def validate_name_en(self, value):
+        if not value.strip():
+            raise serializers.ValidationError('English name is required (used as the fallback and for the URL slug).')
+        return value
 
 
 class ProductImageSerializer(serializers.ModelSerializer):

@@ -10,9 +10,9 @@ class ProductImageInline(admin.TabularInline):
 
 
 @admin.register(Category)
-class CategoryAdmin(admin.ModelAdmin):
+class CategoryAdmin(TranslationAdmin):
     list_display = ('name', 'slug')
-    prepopulated_fields = {'slug': ('name',)}
+    prepopulated_fields = {'slug': ('name_en',)}
 
 
 @admin.register(Product)
