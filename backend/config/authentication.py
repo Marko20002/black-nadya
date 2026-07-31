@@ -1,8 +1,9 @@
 import logging
 
 from rest_framework.authentication import CSRFCheck
-from rest_framework.exceptions import PermissionDenied
+from rest_framework.exceptions import AuthenticationFailed, PermissionDenied
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework_simplejwt.exceptions import InvalidToken
 
 from .auth_cookies import ACCESS_COOKIE_NAME
 
@@ -37,8 +38,28 @@ class CookieJWTAuthentication(JWTAuthentication):
             if raw_token is None:
                 return None
 
-        validated_token = self.get_validated_token(raw_token)
-        user = self.get_user(validated_token)
+        try:
+            validated_token = self.get_validated_token(raw_token)
+            user = self.get_user(validated_token)
+        except (InvalidToken, AuthenticationFailed):
+            # A bn_access cookie that's merely present isn't a credential the
+            # caller deliberately chose to send the way an Authorization
+            # header is — browsers attach cookies automatically to every
+            # matching request, including a logged-out visit to a public,
+            # AllowAny endpoint from a browser that still has a stale/expired
+            # admin cookie lying around from an earlier session. Raising here
+            # turns that into a hard 401 for anyone, even though the endpoint
+            # never required authentication in the first place. Treat it the
+            # same as "no credential was sent" instead: protected endpoints
+            # still end up rejecting the request (their own permission_classes
+            # see an anonymous user and 401/403 accordingly), but AllowAny
+            # ones proceed normally. Requests authenticated via the
+            # Authorization header keep failing hard, matching
+            # JWTAuthentication's normal behavior for a deliberately-sent bad
+            # token.
+            if from_cookie:
+                return None
+            raise
 
         if from_cookie:
             self.enforce_csrf(request)
