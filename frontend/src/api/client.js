@@ -70,7 +70,16 @@ adminApi.interceptors.response.use(
 export async function ensureCsrfCookie() {
   const { data } = await publicApi.get('/auth/csrf/');
   if (data?.csrfToken) {
+    // Attached to both instances, not just adminApi: CookieJWTAuthentication
+    // decides whether to enforce CSRF purely on whether the bn_access
+    // cookie is present on the request — not on whether the endpoint
+    // actually requires authentication. A browser with an active admin
+    // session (e.g. someone testing the admin panel who then submits the
+    // public contact/order form in another tab) still sends that cookie to
+    // publicApi calls, so those need the header too or they get incorrectly
+    // CSRF-blocked despite hitting an AllowAny endpoint.
     adminApi.defaults.headers.common['X-CSRFToken'] = data.csrfToken;
+    publicApi.defaults.headers.common['X-CSRFToken'] = data.csrfToken;
   }
 }
 
