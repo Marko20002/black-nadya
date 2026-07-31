@@ -161,6 +161,12 @@ else:
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Django's default (2.5MB) is easy for an admin to hit with an unmodified
+# phone-camera photo on the homepage/product image uploads — raise it to a
+# generous ceiling for an admin-only, low-traffic upload path.
+DATA_UPLOAD_MAX_MEMORY_SIZE = 15 * 1024 * 1024  # 15MB
+FILE_UPLOAD_MAX_MEMORY_SIZE = 15 * 1024 * 1024
+
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
