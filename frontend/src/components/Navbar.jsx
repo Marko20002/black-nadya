@@ -17,7 +17,7 @@ const LINKS = [
 ];
 
 export default function Navbar() {
-  const { settings } = useSiteSettings();
+  const { settings, loading } = useSiteSettings();
   const { t } = useTranslation();
   const cart = useCart();
   const [cartOpen, setCartOpen] = useState(false);
@@ -26,7 +26,9 @@ export default function Navbar() {
     <header className="navbar">
       <div className="container navbar__inner">
         <NavLink to="/" className="navbar__brand">
-          {settings?.logo_image ? (
+          {loading ? (
+            <span className="navbar__brand-placeholder" />
+          ) : settings?.logo_image ? (
             <img src={settings.logo_image} alt="Black Nadya" className="navbar__logo" />
           ) : (
             <span className="navbar__brand-text">BLACK NADYA</span>

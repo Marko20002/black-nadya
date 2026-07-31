@@ -25,6 +25,12 @@
   object-fit: cover;
 }
 
+.navbar__brand-placeholder {
+  display: block;
+  height: 48px;
+  width: 48px;
+}
+
 .navbar__brand-text {
   font-family: var(--font-serif);
   color: var(--color-gold);
